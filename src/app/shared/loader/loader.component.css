@@ -1,0 +1,86 @@
+/* FULLSCREEN OVERLAY */
+
+.loader-overlay{
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at center,#020617,#000814);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+
+/* MAIN CONTAINER */
+
+.globe-loader{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* EARTH */
+
+.earth{
+  width:150px;
+  height:150px;
+  border-radius:50%;
+
+  background:
+  url("https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif")
+  center/cover;
+
+  box-shadow:
+  inset -40px -40px 60px rgba(0,0,0,0.7),
+  inset 15px 15px 30px rgba(255,255,255,0.3),
+  0 0 40px rgba(0,180,255,0.7);
+
+  position:relative;
+  z-index:2;
+}
+
+/* ORBIT */
+
+.orbit{
+  position:absolute;
+
+  width:220px;
+  height:220px;
+
+  border-radius:50%;
+  border:1px dashed rgba(255,255,255,0.3);
+
+  display:flex;
+  justify-content:center;
+
+  animation:orbitRotate 4s linear infinite;
+}
+
+/* PLANE */
+
+.plane{
+  position:absolute;
+  top:-14px;
+
+  font-size:28px;
+  color:#ff7a18;
+
+  text-shadow:
+  0 0 10px rgba(255,122,24,0.8),
+  0 0 20px rgba(255,122,24,0.5);
+}
+
+/* ANIMATION */
+
+@keyframes orbitRotate{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+
+/* TEXT */
+
+.loading-text{
+  margin-top:75px;
+  color:#e2e8f0;
+  font-size:15px;
+  letter-spacing:0.5px;
+}

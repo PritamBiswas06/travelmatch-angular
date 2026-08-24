@@ -1,0 +1,228 @@
+<div class="feed-wrapper">
+
+  <!-- HEADER -->
+  <header class="feed-header">
+    <div>
+      <h1>Travel <span class="highlight">Feed</span></h1>
+      <p>Discover trips. Meet travelers. Find your perfect travel partner.</p>
+    </div>
+  </header>
+
+  <!-- CONTROLS -->
+  <div class="feed-controls">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        placeholder="Search destination..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+
+    <select (change)="onSortChange($event)">
+      <option value="latest">🔥 Latest</option>
+      <option value="popular">❤️ Popular</option>
+      <option value="match">🎯 Best Match</option>
+    </select>
+  </div>
+
+  <!-- LOADING STATE -->
+  <div class="posts-column" *ngIf="loading">
+    <div class="post-card skeleton" *ngFor="let s of [1,2,3]">
+      <div class="skeleton-line w-40"></div>
+      <div class="skeleton-line w-70 tall"></div>
+      <div class="skeleton-line w-100 tall"></div>
+      <div class="skeleton-line w-100 btn"></div>
+    </div>
+  </div>
+
+  <!-- ERROR STATE -->
+  <div class="state-message" *ngIf="!loading && error">
+    <div class="state-icon">⚠️</div>
+    <h2>Unable to load your travel feed.</h2>
+    <p>Something went wrong while fetching trips. Please try again.</p>
+    <button class="primary-btn" (click)="loadFeed()">Try Again</button>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="state-message" *ngIf="!loading && !error && posts.length === 0">
+    <div class="state-icon">✈️</div>
+    <h2>No trips to discover yet</h2>
+    <p>Create a travel plan and become the first traveler in the feed.</p>
+    <button class="primary-btn" (click)="goToCreatePlan()">+ Create Travel Plan</button>
+  </div>
+
+  <!-- NO SEARCH RESULTS -->
+  <div class="state-message" *ngIf="!loading && !error && posts.length > 0 && filteredPosts.length === 0">
+    <div class="state-icon">🧭</div>
+    <h2>No trips match your search</h2>
+    <p>Try a different destination or clear your search.</p>
+  </div>
+
+  <!-- POSTS -->
+  <div class="posts-column" *ngIf="!loading && !error && filteredPosts.length > 0">
+
+    <article class="post-card" *ngFor="let post of filteredPosts; trackBy: trackByPostId">
+
+      <!-- CARD HEADER -->
+      <div class="post-header">
+        <div class="user-block">
+          <div class="avatar">{{ initials(post.userName) }}</div>
+          <div class="user-meta">
+            <span class="user-name">{{ post.userName }}</span>
+            <span class="user-city" *ngIf="post.userCity">{{ post.userCity }}</span>
+          </div>
+        </div>
+
+        <div class="header-badges">
+          <span class="status-badge">🟢 {{ post.status | titlecase }}</span>
+        </div>
+      </div>
+
+      <div class="match-score" *ngIf="post.matchScore !== null">
+        🔥 {{ post.matchScore }}% Travel Match
+      </div>
+
+      <!-- ROUTE -->
+      <div class="trip-route">
+        <div class="route-point">
+          <h3>{{ post.fromLocation }}</h3>
+          <small>Departure</small>
+        </div>
+
+        <div class="plane">✈️</div>
+
+        <div class="route-point align-right">
+          <h3>{{ post.destination }}</h3>
+          <small>Destination</small>
+        </div>
+      </div>
+
+      <!-- META -->
+      <div class="meta">
+        <span>📅 {{ post.startDate | date:'mediumDate' }}</span>
+        <span>💰 ₹{{ post.budget | number }}</span>
+        <span class="type-tag">🧳 {{ post.travelType }}</span>
+      </div>
+
+      <!-- VIEW TRIP -->
+      <button class="view-trip-btn" (click)="openTrip(post)">View Trip</button>
+
+      <!-- REACTIONS -->
+      <div class="reactions-row">
+        <button
+          class="reaction-btn"
+          [class.active]="post.currentUserReaction === 'LIKE'"
+          [disabled]="isPending(post.id, 'like')"
+          (click)="toggleLike(post)"
+        >
+          ❤️ {{ post.likeCount }}
+        </button>
+
+        <button
+          class="reaction-btn"
+          [class.active]="post.currentUserReaction === 'DISLIKE'"
+          [disabled]="isPending(post.id, 'dislike')"
+          (click)="toggleDislike(post)"
+        >
+          👎 {{ post.dislikeCount }}
+        </button>
+
+        <button class="reaction-btn share-btn" (click)="share(post)">
+          ↗ Share <span *ngIf="post.shareCount > 0">{{ post.shareCount }}</span>
+        </button>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="actions-row">
+        <button class="secondary-btn" (click)="viewProfile(post)">View Profile</button>
+
+        <button
+          class="match-btn"
+          [class.sent]="post.matchRequestStatus === 'PENDING'"
+          [class.accepted]="post.matchRequestStatus === 'ACCEPTED'"
+          [disabled]="post.matchRequestStatus === 'PENDING' || post.matchRequestStatus === 'ACCEPTED' || isPending(post.id, 'match')"
+          (click)="sendMatchRequest(post)"
+        >
+          {{ matchButtonLabel(post) }}
+        </button>
+      </div>
+
+    </article>
+
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" *ngIf="toastMessage">{{ toastMessage }}</div>
+
+  <!-- VIEW TRIP MODAL -->
+  <div class="modal-backdrop" *ngIf="selectedPost" (click)="closeTrip()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+
+      <button class="modal-close" (click)="closeTrip()">✕</button>
+
+      <div class="user-block">
+        <div class="avatar large">{{ initials(selectedPost.userName) }}</div>
+        <div class="user-meta">
+          <span class="user-name">{{ selectedPost.userName }}</span>
+          <span class="user-city" *ngIf="selectedPost.userCity">{{ selectedPost.userCity }}</span>
+        </div>
+      </div>
+
+      <div class="trip-route modal-route">
+        <div class="route-point">
+          <h3>{{ selectedPost.fromLocation }}</h3>
+          <small>Departure</small>
+        </div>
+        <div class="plane">✈️</div>
+        <div class="route-point align-right">
+          <h3>{{ selectedPost.destination }}</h3>
+          <small>Destination</small>
+        </div>
+      </div>
+
+      <div class="modal-details">
+        <div class="detail-row">
+          <span class="label">Start Date</span>
+          <span class="value">{{ selectedPost.startDate | date:'mediumDate' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">End Date</span>
+          <span class="value">{{ selectedPost.endDate | date:'mediumDate' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Budget</span>
+          <span class="value">₹{{ selectedPost.budget | number }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Travel Type</span>
+          <span class="value">{{ selectedPost.travelType }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Status</span>
+          <span class="value">{{ selectedPost.status | titlecase }}</span>
+        </div>
+        <div class="detail-row" *ngIf="selectedPost.matchScore !== null">
+          <span class="label">Match Score</span>
+          <span class="value">🔥 {{ selectedPost.matchScore }}%</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="secondary-btn" (click)="viewProfile(selectedPost)">View Profile</button>
+        <button
+          class="match-btn"
+          [class.sent]="selectedPost.matchRequestStatus === 'PENDING'"
+          [class.accepted]="selectedPost.matchRequestStatus === 'ACCEPTED'"
+          [disabled]="selectedPost.matchRequestStatus === 'PENDING' || selectedPost.matchRequestStatus === 'ACCEPTED' || isPending(selectedPost.id, 'match')"
+          (click)="sendMatchRequest(selectedPost)"
+        >
+          {{ matchButtonLabel(selectedPost) }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

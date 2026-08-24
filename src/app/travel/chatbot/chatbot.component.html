@@ -1,0 +1,42 @@
+<div *ngIf="isOpen" class="chatbot-container">
+
+  <!-- HEADER -->
+  <div class="chatbot-header">
+    <div class="header-left">
+      🤖 Travel AI
+      <small>Your smart planner</small>
+    </div>
+
+    <span class="close-btn" (click)="toggleChat()">✕</span>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="chatbot-messages">
+
+    <div
+      *ngFor="let m of messages"
+      [class.user]="m.sender==='user'"
+      [class.bot]="m.sender==='bot'"
+      class="message"
+    >
+      <div class="bubble">
+        {{m.text}}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INPUT -->
+  <div class="chatbot-input">
+
+    <input
+      [(ngModel)]="message"
+      placeholder="Ask AI about trips, budget, weather..."
+      (keyup.enter)="send()"
+    />
+
+    <button (click)="send()">➤</button>
+
+  </div>
+
+</div>

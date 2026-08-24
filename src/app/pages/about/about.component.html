@@ -1,0 +1,470 @@
+<div class="about-page">
+
+  <!-- NAVBAR -->
+  <header class="navbar" [class.is-scrolled]="scrolled">
+    <div class="navbar-inner">
+      <a routerLink="/" class="logo" (click)="closeMobileMenu()">
+        <span class="mark">✦</span>TravelMatch
+      </a>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a routerLink="/discover">Discover</a>
+        <a routerLink="/how-it-works">How it works</a>
+        <a routerLink="/about" class="active" aria-current="page">About</a>
+        <a routerLink="/safety">Safety</a>
+        <a routerLink="/ai-assistant">AI Travel Assistant</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a routerLink="/login" class="login-link">Login</a>
+        <a routerLink="/register" class="register-btn">Create account</a>
+      </div>
+
+      <button
+        class="menu-toggle"
+        type="button"
+        (click)="toggleMobileMenu()"
+        [attr.aria-expanded]="mobileMenuOpen"
+        aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="mobile-menu" *ngIf="mobileMenuOpen">
+      <a routerLink="/discover" (click)="closeMobileMenu()">Discover</a>
+      <a routerLink="/how-it-works" (click)="closeMobileMenu()">How it works</a>
+      <a routerLink="/about" (click)="closeMobileMenu()">About</a>
+      <a routerLink="/safety" (click)="closeMobileMenu()">Safety</a>
+      <a routerLink="/ai-assistant" (click)="closeMobileMenu()">AI Travel Assistant</a>
+      <div class="mobile-menu-actions">
+        <a routerLink="/login" class="login-link" (click)="closeMobileMenu()">Login</a>
+        <a routerLink="/register" class="register-btn" (click)="closeMobileMenu()">Create account</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+     <br>
+    <section class="hero-section">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">About TravelMatch</div>
+          <h1>Travel was never<br>meant to be<br><em>experienced alone.</em></h1>
+          <p class="hero-sub">
+            Finding a destination is easy. Finding the right person to
+            experience it with is not. TravelMatch exists to close that gap.
+          </p>
+          <div class="cta-group">
+            <a routerLink="/register" class="btn-fill">Start your journey</a>
+            <a routerLink="/how-it-works" class="btn-outline">Explore TravelMatch</a>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="route-map">
+            <img class="route-photo" src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80" alt="">
+            <svg class="route-line" viewBox="0 0 300 200" preserveAspectRatio="none">
+              <path d="M40,150 C90,60 140,180 190,80 C215,35 250,55 270,30" stroke="var(--sand)" stroke-width="2" stroke-dasharray="1 9" stroke-linecap="round" fill="none"/>
+            </svg>
+            <div class="pin pin-a">
+              <span class="pin-dot"></span>
+              <span class="pin-label mono">GOA</span>
+            </div>
+            <div class="pin pin-b">
+              <span class="pin-dot"></span>
+              <span class="pin-label mono">UDAIPUR</span>
+            </div>
+          </div>
+
+          <div class="floating-card card-people">
+            <div class="mini-avatars">
+              <img src="https://i.pravatar.cc/60?img=12" alt="">
+              <img src="https://i.pravatar.cc/60?img=25" alt="">
+              <img src="https://i.pravatar.cc/60?img=41" alt="">
+            </div>
+            <div class="mini-text">
+              <div class="mini-title">3 travelers</div>
+              <div class="mini-sub mono">heading to Goa · Sept</div>
+            </div>
+          </div>
+
+          <div class="floating-card card-score">
+            <div class="score-ring mono">94%</div>
+            <div class="mini-text">
+              <div class="mini-title">Compatibility</div>
+              <div class="mini-sub mono">destination · dates · budget</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+<br>
+<br>
+    <!-- OUR STORY -->
+    <section class="section story-section">
+      <div class="story-grid">
+        <div class="story-copy">
+          <div class="eyebrow">Why TravelMatch exists</div>
+          <h2 class="section-title left">Everyone wants to travel. Not everyone can find who to travel with.</h2>
+          <p class="section-sub left">
+            Friends have different schedules. Budgets don't line up. Interests
+            pull people toward different kinds of trips entirely. And going
+            with strangers, without any sense of whether you'd actually get
+            along, feels like a gamble most people aren't willing to take.
+          </p>
+          <p class="section-sub left">
+            TravelMatch exists to make finding compatible travel companions a
+            straightforward part of planning a trip &mdash; not a problem you
+            solve by luck.
+          </p>
+        </div>
+
+        <div class="story-visual" aria-hidden="true">
+          <div class="input-stack">
+            <div class="input-chip"><span>Destination</span></div>
+            <div class="input-chip"><span>Dates</span></div>
+            <div class="input-chip"><span>Budget</span></div>
+            <div class="input-chip"><span>Interests</span></div>
+            <div class="input-chip"><span>Travel style</span></div>
+          </div>
+          <div class="stack-arrow">↓</div>
+          <div class="output-chip">
+            <span class="output-dot"></span>
+            Compatible travelers
+          </div>
+        </div>
+      </div>
+    </section>
+<br>
+    <!-- THE PROBLEM -->
+    <section class="section problem-section">
+      <div class="section-head">
+        <div class="eyebrow">The problem</div>
+        <h2 class="section-title">Traveling solo shouldn't mean traveling alone</h2>
+      </div>
+
+      <div class="problem-grid">
+        <div class="problem-card" *ngFor="let p of problemCards; trackBy: trackByIndex">
+          <div class="problem-icon" [attr.data-icon]="p.icon" aria-hidden="true"></div>
+          <h3>{{ p.title }}</h3>
+          <p>{{ p.quote }}</p>
+        </div>
+      </div>
+    </section>
+<br>
+    <!-- OUR SOLUTION -->
+    <section class="section solution-section">
+      <div class="section-head">
+        <div class="eyebrow">Our solution</div>
+        <h2 class="section-title">Meet TravelMatch</h2>
+        <p class="section-sub">One flow, from an idea for a trip to people to take it with.</p>
+      </div>
+
+      <div class="workflow">
+        <div class="workflow-step">
+          <div class="workflow-index mono">01</div>
+          <div class="workflow-label">User creates a trip</div>
+        </div>
+        <div class="workflow-arrow" aria-hidden="true">↓</div>
+        <div class="workflow-step workflow-analyze">
+          <div class="workflow-index mono">02</div>
+          <div class="workflow-label">TravelMatch analyzes</div>
+          <div class="analyze-tags">
+            <span>Destination</span><span>Dates</span><span>Budget</span><span>Interests</span><span>Travel style</span>
+          </div>
+        </div>
+        <div class="workflow-arrow" aria-hidden="true">↓</div>
+        <div class="workflow-step">
+          <div class="workflow-index mono">03</div>
+          <div class="workflow-label">Compatible travelers appear</div>
+        </div>
+        <div class="workflow-arrow" aria-hidden="true">↓</div>
+        <div class="workflow-step">
+          <div class="workflow-index mono">04</div>
+          <div class="workflow-label">Users connect &amp; plan together</div>
+        </div>
+        <div class="workflow-arrow" aria-hidden="true">↓</div>
+        <div class="workflow-step workflow-final">
+          <div class="workflow-index mono">05</div>
+          <div class="workflow-label">Travel together</div>
+        </div>
+      </div>
+    </section>
+<br>
+    <!-- HOW MATCHING WORKS -->
+    <section class="section matching-section">
+      <div class="matching-grid">
+        <div class="matching-copy">
+          <div class="eyebrow">Our philosophy</div>
+          <h2 class="section-title left">Compatibility over popularity</h2>
+          <p class="section-sub left">
+            TravelMatch isn't built around scrolling through profiles. The
+            concept is a shortlist, ranked by how well a trip actually fits &mdash;
+            not who has the most followers or the flashiest photos.
+          </p>
+        </div>
+
+        <div class="compat-card">
+          <div class="compat-top">
+            <div class="compat-score-ring mono">94%</div>
+            <div class="compat-heading">Match</div>
+          </div>
+          <div class="compat-row">
+            <span class="compat-label">Destination</span>
+            <span class="compat-value">Goa</span>
+          </div>
+          <div class="compat-row">
+            <span class="compat-label">Dates</span>
+            <span class="compat-value">12 Sept &ndash; 17 Sept</span>
+          </div>
+          <div class="compat-row">
+            <span class="compat-label">Budget</span>
+            <span class="compat-value">₹12k &ndash; ₹18k</span>
+          </div>
+          <div class="compat-row">
+            <span class="compat-label">Interests</span>
+            <span class="compat-value tags">
+              <span class="tag">Beach</span><span class="tag">Food</span><span class="tag">Photography</span><span class="tag">Adventure</span>
+            </span>
+          </div>
+          <div class="compat-row">
+            <span class="compat-label">Travel style</span>
+            <span class="compat-value">Relaxed + social</span>
+          </div>
+          <a routerLink="/register" class="btn-outline small compat-cta">View profile</a>
+        </div>
+      </div>
+    </section>
+<br>
+    <!-- VALUES -->
+    <section class="section values-section">
+      <div class="section-head">
+        <div class="eyebrow">What we believe</div>
+        <h2 class="section-title">Our values</h2>
+      </div>
+
+      <div class="values-grid">
+        <div class="value-card" *ngFor="let v of values; trackBy: trackByIndex">
+          <div class="value-number mono">{{ v.number }}</div>
+          <h3>{{ v.title }}</h3>
+          <p>{{ v.description }}</p>
+        </div>
+      </div>
+    </section>
+<br>
+    <!-- SAFETY & TRUST -->
+    <section class="section safety-section" id="safety">
+      <div class="safety-grid">
+        <div class="safety-copy">
+          <div class="eyebrow">Safety &amp; trust</div>
+          <h2 class="section-title left">Travel connections should feel safe</h2>
+          <p class="section-sub left">
+            Meeting a travel companion through TravelMatch should never feel
+            riskier than meeting one any other way. Some of this is already
+            built in. Some of it is part of where we're headed.
+          </p>
+          <a routerLink="/safety" class="btn-fill">Learn about safety</a>
+        </div>
+
+        <ul class="safety-list">
+          <li>
+            <span class="safety-status live">Live</span>
+            <div>
+              <div class="safety-item-title">Email verification</div>
+              <p>Every account confirms a real email before messaging another traveler.</p>
+            </div>
+          </li>
+          <li>
+            <span class="safety-status live">Live</span>
+            <div>
+              <div class="safety-item-title">Report &amp; block</div>
+              <p>Any profile or conversation can be reported or blocked directly.</p>
+            </div>
+          </li>
+          <li>
+            <span class="safety-status live">Live</span>
+            <div>
+              <div class="safety-item-title">Private by default</div>
+              <p>Contact details stay hidden until you choose to share them in chat.</p>
+            </div>
+          </li>
+          <li>
+            <span class="safety-status live">Live</span>
+            <div>
+              <div class="safety-item-title">Visibility controls</div>
+              <p>Choose which travel preferences are shown to potential matches.</p>
+            </div>
+          </li>
+          <li>
+            <span class="safety-status vision">Part of our vision</span>
+            <div>
+              <div class="safety-item-title">Expanded identity verification</div>
+              <p>Coming to TravelMatch as the platform grows.</p>
+            </div>
+          </li>
+          <li>
+            <span class="safety-status vision">Part of our vision</span>
+            <div>
+              <div class="safety-item-title">Community moderation tools</div>
+              <p>Coming to TravelMatch, alongside a published set of community guidelines.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+<br>
+    <!-- AI ASSISTANT -->
+    <section class="section ai-section" id="ai-assistant">
+      <div class="ai-grid">
+        <div class="ai-copy">
+          <div class="eyebrow">Built in</div>
+          <h2 class="section-title left">Travel planning, with a little help from AI</h2>
+          <p class="section-sub left">
+            Not sure where to start? The assistant helps you think it through
+            &mdash; destinations, itineraries, activities, budgets &mdash; and,
+            where relevant, points you toward people already planning something similar.
+          </p>
+          <a routerLink="/ai-assistant" class="btn-fill">Try TravelMatch AI</a>
+        </div>
+
+        <div class="ai-preview" aria-hidden="true">
+          <div class="chat-window">
+            <div class="chat-header"><span class="chat-dot"></span>TravelMatch AI</div>
+            <div class="chat-bubble user">I have 5 days and ₹15,000. Where should I go?</div>
+            <div class="chat-bubble ai">Here are three destinations that fit your budget:</div>
+          </div>
+          <div class="ai-dest-row">
+            <div class="ai-dest-card" *ngFor="let d of aiDestinations; trackBy: trackByIndex">
+              <img [src]="d.image" [alt]="d.name" loading="lazy">
+              <div class="ai-dest-info">
+                <div class="ai-dest-name">{{ d.name }}</div>
+                <div class="ai-dest-budget mono">{{ d.budget }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+<br>
+    <!-- THE TRAVELMATCH EXPERIENCE -->
+    <section class="section timeline-section">
+      <div class="section-head">
+        <div class="eyebrow">More than matching</div>
+        <h2 class="section-title">The TravelMatch experience</h2>
+        <p class="section-sub">A complete journey, not a single transaction.</p>
+      </div>
+
+      <ol class="timeline">
+        <li class="timeline-stage" *ngFor="let t of timeline; trackBy: trackByIndex; let i = index">
+          <div class="timeline-marker">
+            <span class="timeline-dot"></span>
+            <span class="timeline-connector" *ngIf="i < timeline.length - 1"></span>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-label mono">{{ t.label }}</div>
+            <h3>{{ t.title }}</h3>
+            <p>{{ t.description }}</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+<br>
+    <!-- COMMUNITY -->
+    <section class="section community-section">
+      <div class="section-head">
+        <div class="eyebrow">Who it's for</div>
+        <h2 class="section-title">Built for curious people</h2>
+        <p class="section-sub">Whatever kind of traveler you are, there's likely someone on TravelMatch planning something similar.</p>
+      </div>
+
+      <div class="persona-grid">
+        <div class="persona-card" *ngFor="let p of personas; trackBy: trackByIndex">
+          <img [src]="p.photo" [alt]="p.title" class="persona-photo">
+          <h3>{{ p.title }}</h3>
+          <p>{{ p.description }}</p>
+        </div>
+      </div>
+    </section>
+<br>
+    <!-- VISION -->
+    <section class="section vision-section">
+      <div class="vision-grid">
+        <div>
+          <div class="eyebrow">Where we're going</div>
+          <h2 class="section-title left">Where we're going</h2>
+          <p class="section-sub left">
+            TravelMatch aims to become a place where people can discover
+            destinations, find compatible travelers, plan real experiences,
+            and build travel connections that last past a single trip.
+          </p>
+        </div>
+
+        <div>
+          <div class="vision-subhead">What's next</div>
+          <ul class="next-list">
+            <li *ngFor="let item of whatsNext; trackBy: trackByIndex">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+<br>
+    <!-- MISSION STATEMENT -->
+    <section class="section mission-section">
+      <div class="mission-block">
+        <p class="mission-text">
+          We're building a world where the question isn't<br>
+          <span class="mission-strike">"Who can I travel with?"</span><br>
+          but<br>
+          <em>"Who should I travel with?"</em>
+        </p>
+      </div>
+    </section>
+<br>
+    <!-- FINAL CTA -->
+    <section class="section">
+      <div class="final-cta">
+        <h2>Your next destination is waiting.<br>Maybe your next travel companion is too.</h2>
+        <div class="final-cta-actions">
+          <a routerLink="/register" class="btn-fill">Create your free profile</a>
+          <a routerLink="/how-it-works" class="btn-outline on-coral">Explore TravelMatch</a>
+        </div>
+      </div>
+    </section>
+<br>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo"><span class="mark">✦</span>TravelMatch</div>
+        <p>Find the right people for your next journey.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a routerLink="/discover">Discover</a>
+          <a routerLink="/how-it-works">How it works</a>
+          <a routerLink="/ai-assistant">AI Assistant</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a routerLink="/about">About</a>
+          <a routerLink="/safety">Safety</a>
+          <a routerLink="/support">Support</a>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a routerLink="/privacy">Privacy</a>
+          <a routerLink="/terms">Terms</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 TravelMatch. Made for people who'd rather not travel alone.</div>
+      <a routerLink="/register" class="footer-cta">Create free account →</a>
+    </div>
+  </footer>
+
+</div>

@@ -1,0 +1,59 @@
+<div class="matches-page">
+  <header class="matches-header">
+    <div class="header-content">
+      <h2>Found <span class="highlight">{{matches.length}} Matches</span></h2>
+      <p>Based on your destination, budget, and travel dates.</p>
+    </div>
+    <button class="back-btn" routerLink="/dashboard">← Back to Dashboard</button>
+  </header>
+
+  <hr class="divider">
+
+  <div class="empty-state" *ngIf="matches.length === 0">
+    <div class="empty-icon">🔍</div>
+    <h3>No matches found yet</h3>
+    <p>Try adjusting your travel plan budget or dates to find more partners.</p>
+  </div>
+
+  <main class="matches-grid" *ngIf="matches.length > 0">
+    <div class="match-card" *ngFor="let match of matches">
+      
+      <div class="score-container">
+        <div class="score-circle">
+          <span class="score-number">{{match.score}}%</span>
+          <span class="score-label">Match</span>
+        </div>
+      </div>
+
+      <div class="match-info">
+        <div class="destination-header">
+          <small>Destination</small>
+          <h3>{{match.travelPlan.destination}}</h3>
+        </div>
+
+        <div class="match-details">
+          <div class="detail">
+            <span class="icon">📍</span>
+            <div>
+              <small>Starting From</small>
+              <p>{{match.travelPlan.fromLocation}}</p>
+            </div>
+          </div>
+          
+          <div class="detail">
+            <span class="icon">💰</span>
+            <div>
+              <small>Estimated Budget</small>
+              <p>₹{{match.travelPlan.budget}}</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="request-btn" (click)="sendRequest(match.travelPlan.id)">
+          <span class="btn-icon">🤝</span> Send Match Request
+        </button>
+      </div>
+
+    </div>
+  </main>
+</div>

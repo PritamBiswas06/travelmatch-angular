@@ -1,0 +1,238 @@
+<div class="page-wrapper">
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-content">
+      <a routerLink="/dashboard" class="back-link">
+        <span class="back-arrow">←</span>
+        <span>Exit to Dashboard</span>
+      </a>
+      <div class="nav-brand">
+        <span class="brand-badge">TravelMatch Studio</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <div class="form-shell">
+      <!-- Header Section -->
+      <div class="form-intro">
+        <div class="title-group">
+          <h1>Create Travel Plan</h1>
+          <p>Design your journey, select destinations, and visualize live routes in real time.</p>
+        </div>
+      </div>
+
+      <form #planForm="ngForm" (ngSubmit)="onSubmit()" class="plan-form">
+        <!-- Route Selection Grid -->
+        <div class="section-card">
+          <div class="card-header">
+            <span class="step-num">01</span>
+            <h3>Origin & Destination</h3>
+          </div>
+          
+          <div class="input-grid">
+            <div class="control-group">
+              <label for="from">From City</label>
+              <div class="input-field">
+                <span class="input-icon">🛫</span>
+                <input 
+                  type="text" 
+                  id="from" 
+                  name="from" 
+                  [(ngModel)]="planData.fromLocation"
+                  (input)="fetchSuggestions(planData.fromLocation, 'from')" 
+                  placeholder="e.g. London" 
+                  autocomplete="off" 
+                  required 
+                />
+                <ul class="dropdown-results" *ngIf="fromSuggestions.length">
+                  <li *ngFor="let item of fromSuggestions" (click)="selectSuggestion(item, 'from')">
+                    <span class="pin-icon">📍</span>
+                    <span class="location-name">{{ item.address?.city || item.address?.town || item.display_name }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label for="dest">Destination</label>
+              <div class="input-field">
+                <span class="input-icon">🛬</span>
+                <input 
+                  type="text" 
+                  id="dest" 
+                  name="dest" 
+                  [(ngModel)]="planData.destination"
+                  (input)="fetchSuggestions(planData.destination, 'dest')" 
+                  placeholder="e.g. Paris" 
+                  autocomplete="off" 
+                  required 
+                />
+                <ul class="dropdown-results" *ngIf="destSuggestions.length">
+                  <li *ngFor="let item of destSuggestions" (click)="selectSuggestion(item, 'dest')">
+                    <span class="pin-icon">📍</span>
+                    <span class="location-name">{{ item.address?.city || item.address?.town || item.display_name }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip Details Grid -->
+        <div class="section-card">
+          <div class="card-header">
+            <span class="step-num">02</span>
+            <h3>Trip Preferences</h3>
+          </div>
+
+          <div class="input-grid quad">
+            <div class="control-group">
+              <label for="start">Start Date</label>
+              <div class="input-field">
+                <input type="date" id="start" name="start" [(ngModel)]="planData.startDate" required />
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label for="end">End Date</label>
+              <div class="input-field">
+                <input type="date" id="end" name="end" [(ngModel)]="planData.endDate" required />
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label for="budget">Budget ($)</label>
+              <div class="input-field">
+                <input type="number" id="budget" name="budget" [(ngModel)]="planData.budget" placeholder="e.g. 1500" required />
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label for="type">Travel Style</label>
+              <div class="input-field">
+                <select id="type" name="type" [(ngModel)]="planData.travelType" required>
+                  <option value="" disabled selected>Select Style</option>
+                  <option value="Solo">Solo Explorer</option>
+                  <option value="Backpacking">Backpacking</option>
+                  <option value="Luxury">Luxury & Comfort</option>
+                  <option value="Budget">Budget Friendly</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Map & Route Panel -->
+        <div class="map-layout">
+          <div class="map-panel">
+            <div id="map"></div>
+          </div>
+
+          <div class="travel-panel">
+            <!-- AI Assistant Panel -->
+            <div class="ai-panel">
+              <div class="panel-header">
+                <span class="ai-badge">AI Assistant</span>
+                <h3>Route Insights</h3>
+              </div>
+              
+              <div *ngIf="distance !== '0'; else emptyAI" class="ai-content">
+                <div class="ai-tip-item">
+                  <span class="tip-icon">⚡</span>
+                  <div>
+                    <label>Recommended Mode</label>
+                    <p><b>{{ aiTips.bestTime }}</b></p>
+                  </div>
+                </div>
+                <div class="ai-tip-item">
+                  <span class="tip-icon">💡</span>
+                  <div>
+                    <label>Budget Tip</label>
+                    <p><b>{{ aiTips.budget }}</b></p>
+                  </div>
+                </div>
+                <div class="ai-tip-item">
+                  <span class="tip-icon">🌤</span>
+                  <div>
+                    <label>Weather Forecast</label>
+                    <p><b>{{ aiTips.weather }}</b></p>
+                  </div>
+                </div>
+              </div>
+
+              <ng-template #emptyAI>
+                <div class="placeholder-box">
+                  <span class="sparkle-icon">✨</span>
+                  <p class="placeholder-text">Enter origin & destination to unlock live route insights.</p>
+                </div>
+              </ng-template>
+            </div>
+
+            <!-- Route Metrics -->
+            <div *ngIf="distance === '0'" class="empty-state">
+              <div class="empty-icon">🌐</div>
+              <p class="empty-title">Map Overview</p>
+              <p class="empty-text">Select both cities above to view route distance, travel duration, and recommendations.</p>
+            </div>
+
+            <div *ngIf="distance !== '0'" class="metrics-active">
+              <div class="distance-box">
+                <div class="stat-group">
+                  <span class="main-stat">{{ distance }} <small>km</small></span>
+                  <span class="sub-stat">Est. {{ travelTime }} hrs driving</span>
+                </div>
+              </div>
+
+              <div class="travel-options">
+                <div class="travel-card">
+                  <div class="card-left">
+                    <span class="icon">🚗</span>
+                    <span class="mode">Driving</span>
+                  </div>
+                  <span class="time">{{ travelOptions?.car }} hrs</span>
+                </div>
+
+                <div class="travel-card">
+                  <div class="card-left">
+                    <span class="icon">🚆</span>
+                    <span class="mode">Rail</span>
+                  </div>
+                  <span class="time">{{ travelOptions?.train }} hrs</span>
+                </div>
+
+                <div class="travel-card">
+                  <div class="card-left">
+                    <span class="icon">✈️</span>
+                    <span class="mode">Air (Direct)</span>
+                  </div>
+                  <span class="time">{{ travelOptions?.flight }} hrs</span>
+                </div>
+              </div>
+
+              <!-- Nearby Stays -->
+              <div class="stays-section" *ngIf="nearbyPlaces.length">
+                <h4>Recommended Stays</h4>
+                <ul class="nearby-list">
+                  <li *ngFor="let place of nearbyPlaces">
+                    <span class="stay-icon">🏨</span>
+                    <span>{{ place.display_name.split(',').slice(0,2).join(',') }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="submit" class="submit-btn" [disabled]="!planForm.valid">
+            <span>Save & Create Travel Plan</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>

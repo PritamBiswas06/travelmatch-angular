@@ -1,0 +1,36 @@
+<div class="page-wrapper">
+  <header class="page-header">
+    <a routerLink="/dashboard" class="back-link">← Back to Dashboard</a>
+    <h1>My <span class="highlight">Travel Partners</span></h1>
+    <p>You have {{partners.length}} active connections. Start planning!</p>
+  </header>
+
+  <main class="partners-grid">
+    <div class="empty-state" *ngIf="partners.length === 0">
+      <div class="empty-icon">🤝</div>
+      <h3>No partners yet</h3>
+      <p>Accept a match request or send one to start building your travel circle.</p>
+      <button class="btn-primary" routerLink="/dashboard">Find Matches</button>
+    </div>
+
+    <div class="partner-card" *ngFor="let partner of partners">
+      <div class="card-inner">
+        <div class="partner-avatar">
+          <span>{{ getPartnerName(partner)[0] }}</span>
+        </div>
+        
+        <div class="partner-details">
+          <h3 class="partner-name">{{ getPartnerName(partner) }}</h3>
+          <small class="trip-label">Trip to {{partner.travelPlan.destination}}</small>
+          <p class="status-text">Connection Active</p>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn-chat" (click)="openChat(partner)">
+            <span class="chat-icon">💬</span> Chat
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

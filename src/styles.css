@@ -1,0 +1,125 @@
+/* You can add global styles to this file, and also import other style files */
+/* =========================
+   GLOBAL RESET
+========================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  scroll-behavior: smooth;
+}
+
+/* Remove unwanted white borders */
+body {
+  background-color: #f5f6fa;
+  color: #222;
+  overflow-x: hidden;
+}
+
+/* =========================
+   GLOBAL CONTAINER
+========================= */
+
+.container {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* =========================
+   GLOBAL BUTTON STYLE
+========================= */
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:focus {
+  outline: none;
+}
+
+.btn-primary {
+  background: #1f1c2c;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 30px;
+  border: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.btn-outline {
+  border: 1px solid #1f1c2c;
+  padding: 8px 20px;
+  border-radius: 25px;
+  background: transparent;
+  color: #1f1c2c;
+}
+
+/* =========================
+   GLOBAL CARD STYLE
+========================= */
+
+.card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================
+   GLOBAL INPUT STYLE
+========================= */
+
+input, textarea {
+  font-family: inherit;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #6a11cb;
+}
+
+/* =========================
+   SCROLLBAR (Professional Look)
+========================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* =========================
+   RESPONSIVE FIXES
+========================= */
+
+@media (max-width: 900px) {
+  .container {
+    padding: 0 20px;
+  }
+}

@@ -1,0 +1,202 @@
+/* 1. Page Reset & Layout */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.matches-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at top right, #2d1b4e, #1c1c2c);
+  color: white;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  padding: 40px 8%;
+}
+
+/* 2. Header & Divider */
+.matches-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.highlight {
+  color: #86a8e7;
+}
+
+.matches-header p {
+  color: #94a3b8;
+  margin-top: 5px;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 40px;
+}
+
+/* 3. Grid & Cards */
+.matches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+}
+
+.match-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 30px;
+  display: flex;
+  gap: 25px;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.match-card:hover {
+  transform: translateY(-10px);
+  border-color: #7f7fd5;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* 4. Score Circle Styling */
+.score-container {
+  display: flex;
+  align-items: flex-start;
+}
+
+.score-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid #7f7fd5;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(127, 127, 213, 0.1);
+  box-shadow: 0 0 15px rgba(127, 127, 213, 0.2);
+}
+
+.score-number {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.score-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #86a8e7;
+}
+
+/* 5. Info Section */
+.match-info {
+  flex: 1;
+}
+
+.destination-header {
+  margin-bottom: 20px;
+}
+
+.destination-header small {
+  color: #64748b;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.destination-header h3 {
+  font-size: 22px;
+  color: white;
+}
+
+.match-details {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.detail {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.detail .icon {
+  font-size: 20px;
+  opacity: 0.8;
+}
+
+.detail small {
+  display: block;
+  font-size: 10px;
+  color: #64748b;
+}
+
+.detail p {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 6. Request Button */
+.request-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #7f7fd5, #86a8e7);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  transition: 0.3s;
+}
+
+.request-btn:hover {
+  box-shadow: 0 10px 20px rgba(127, 127, 213, 0.4);
+  transform: scale(1.02);
+}
+
+/* 7. Empty State */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 30px;
+  border: 2px dashed rgba(255, 255, 255, 0.05);
+}
+
+.empty-icon { font-size: 60px; margin-bottom: 20px; }
+.empty-state h3 { margin-bottom: 10px; font-size: 24px; }
+.empty-state p { color: #64748b; }
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .matches-header { flex-direction: column; gap: 20px; }
+  .match-card { flex-direction: column; align-items: center; text-align: center; }
+  .score-container { margin-bottom: 10px; }
+  .detail { justify-content: center; }
+}

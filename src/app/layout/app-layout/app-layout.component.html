@@ -1,0 +1,62 @@
+<div class="app-layout">
+
+  <aside class="sidebar" [class.collapsed]="!sidebarOpen">
+    <div class="sidebar-header">
+      <span class="logo" *ngIf="sidebarOpen">✈ TravelMatch</span>
+      <span class="logo-icon" *ngIf="!sidebarOpen">✈</span>
+      <button class="toggle-btn" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+        {{ sidebarOpen ? '‹' : '›' }}
+      </button>
+    </div>
+
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <span class="icon">🏠</span>
+        <span class="label" *ngIf="sidebarOpen">Dashboard</span>
+      </a>
+      <a routerLink="/feed" routerLinkActive="active">
+        <span class="icon">📰</span>
+        <span class="label" *ngIf="sidebarOpen">Feed</span>
+      </a>
+      <a *ngIf="myUserId" [routerLink]="['/profile', myUserId]" routerLinkActive="active">
+        <span class="icon">👤</span>
+        <span class="label" *ngIf="sidebarOpen">Profile</span>
+      </a>
+      <a routerLink="/create-plan" routerLinkActive="active">
+        <span class="icon">➕</span>
+        <span class="label" *ngIf="sidebarOpen">Create Plan</span>
+      </a>
+      <a routerLink="/requests" routerLinkActive="active">
+        <span class="icon">📩</span>
+        <span class="label" *ngIf="sidebarOpen">Requests</span>
+      </a>
+      <a routerLink="/partners" routerLinkActive="active">
+        <span class="icon">🤝</span>
+        <span class="label" *ngIf="sidebarOpen">Partners</span>
+      </a>
+    </nav>
+
+    <button class="logout" (click)="logout()">
+      <span class="icon">🚪</span>
+      <span class="label" *ngIf="sidebarOpen">Logout</span>
+    </button>
+  </aside>
+
+  <div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="toggleSidebar()"></div>
+
+  <div class="main-wrapper">
+    <header class="mobile-topbar">
+      <button class="mobile-menu-btn" (click)="toggleSidebar()" aria-label="Open menu">☰</button>
+      <span class="mobile-topbar-title">✈ TravelMatch</span>
+    </header>
+
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <button class="chatbot-toggle" (click)="toggleChatbot()">💬</button>
+
+  <app-chatbot *ngIf="showChatbot"></app-chatbot>
+
+</div>

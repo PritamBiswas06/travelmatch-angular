@@ -1,0 +1,94 @@
+<div class="dashboard-wrapper">
+
+  <!-- HEADER -->
+  <header class="dashboard-header">
+    <div>
+      <h1>
+        Welcome back, <span class="highlight">{{userName}}</span> 👋
+      </h1>
+      <p>{{plans.length}} travel plans waiting for you</p>
+
+      <!-- QUICK STATS -->
+      <div class="quick-stats">
+        <span>🧳 Trips: {{plans.length}}</span>
+        <span>🤝 Matches: {{plans.length * 3}}</span>
+        <span>💬 Chats: {{plans.length * 2}}</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <select (change)="onSortChange($event)">
+        <option value="latest">🔥 Latest</option>
+        <option value="budget">💰 Budget</option>
+        <option value="date">📅 Date</option>
+      </select>
+
+      <button class="create-btn" (click)="goToCreatePlan()">
+        + New Trip
+      </button>
+    </div>
+  </header>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" *ngIf="plans.length === 0">
+    <div class="empty-icon">🌍</div>
+    <h2>No trips yet</h2>
+    <p>Start your first journey and find travel partners 🚀</p>
+    <button (click)="goToCreatePlan()">Create First Trip</button>
+  </div>
+
+  <!-- PLANS -->
+  <div class="plans-grid" *ngIf="plans.length > 0">
+
+    <div 
+      class="plan-card"
+      *ngFor="let plan of plans; let i = index"
+      [class.latest]="i === 0"
+    >
+
+      <!-- TOP -->
+      <div class="card-top">
+        <span class="trip-tag">{{plan.travelType}}</span>
+
+        <div class="top-right">
+          <span class="status">🟢 Active</span>
+          <span class="latest-badge" *ngIf="i === 0">🔥 Latest</span>
+        </div>
+      </div>
+
+      <!-- MATCH SCORE -->
+      <div class="match-score">
+        🔥 {{80 + i}}% Match
+      </div>
+
+      <!-- ROUTE -->
+      <div class="trip-route">
+        <div>
+          <h3>{{plan.fromLocation}}</h3>
+          <small>Departure</small>
+        </div>
+
+        <div class="plane">✈️</div>
+
+        <div>
+          <h3>{{plan.destination}}</h3>
+          <small>Destination</small>
+        </div>
+      </div>
+
+      <!-- META -->
+      <div class="meta">
+        <span>📅 {{plan.startDate | date:'mediumDate'}}</span>
+        <span>💰 ₹{{plan.budget}}</span>
+      </div>
+
+      <!-- ACTION -->
+      <button (click)="goToMatches(plan.id)">
+        Find Travel Partners
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

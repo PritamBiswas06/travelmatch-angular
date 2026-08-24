@@ -1,0 +1,51 @@
+<div class="verify-container">
+
+  <div class="verify-card">
+
+    <h2>Verify Reset Code</h2>
+    <p>Enter the 6-digit code sent to your email</p>
+
+    <!-- real input -->
+    <input
+      class="otp-hidden-input"
+      type="text"
+      maxlength="6"
+      inputmode="numeric"
+      autocomplete="one-time-code"
+      [(ngModel)]="otpValue"
+      (input)="onOtpChange()"
+      (paste)="onPaste($event)"
+      #otpInput
+    />
+
+    <!-- visual digits -->
+    <div class="otp-preview" (click)="focusInput()">
+      {{ otpValue.split('').join(' ') }}
+    </div>
+
+    <div class="resend-section">
+
+      <span *ngIf="!canResend">
+        Resend OTP in {{resendTimer}}s
+      </span>
+
+      <button
+        *ngIf="canResend"
+        class="resend-btn"
+        (click)="resendOtp()"
+      >
+        Resend OTP
+      </button>
+
+    </div>
+
+    <button
+      class="verify-btn"
+      (click)="verify()"
+    >
+      Verify Code
+    </button>
+
+  </div>
+
+</div>

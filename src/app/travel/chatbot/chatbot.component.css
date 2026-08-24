@@ -1,0 +1,197 @@
+.chatbot-container{
+
+  position:fixed;
+  bottom:90px;
+  right:25px;
+
+  width:340px;
+  height:460px;
+
+  background:rgba(15,23,42,0.95);
+  backdrop-filter:blur(16px);
+
+  border-radius:20px;
+
+  box-shadow:0 30px 80px rgba(0,0,0,0.6);
+
+  display:flex;
+  flex-direction:column;
+
+  overflow:hidden;
+
+  animation:slideUp 0.4s ease;
+}
+
+/* HEADER */
+
+.chatbot-header{
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:14px 16px;
+
+  background:linear-gradient(135deg,#6366f1,#06b6d4);
+
+  color:white;
+
+  font-weight:600;
+}
+
+.header-left small{
+  display:block;
+  font-size:11px;
+  opacity:0.8;
+}
+
+.close-btn{
+  cursor:pointer;
+  font-size:14px;
+}
+
+/* MESSAGES */
+
+.chatbot-messages{
+
+  flex:1;
+  padding:12px;
+
+  overflow-y:auto;
+
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* MESSAGE */
+
+.message{
+  display:flex;
+}
+
+.user{
+  justify-content:flex-end;
+}
+
+.bot{
+  justify-content:flex-start;
+}
+
+/* BUBBLE */
+
+.bubble{
+
+  max-width:75%;
+
+  padding:10px 14px;
+
+  border-radius:14px;
+
+  font-size:13px;
+  line-height:1.4;
+
+  animation:fadeIn 0.3s ease;
+}
+
+/* USER STYLE */
+
+.user .bubble{
+  background:linear-gradient(135deg,#6366f1,#06b6d4);
+  color:white;
+  border-bottom-right-radius:4px;
+}
+
+/* BOT STYLE */
+
+.bot .bubble{
+  background:#1e293b;
+  color:#e2e8f0;
+  border-bottom-left-radius:4px;
+}
+
+/* INPUT */
+
+.chatbot-input{
+
+  display:flex;
+
+  border-top:1px solid rgba(255,255,255,0.1);
+
+  background:rgba(0,0,0,0.2);
+}
+
+.chatbot-input input{
+
+  flex:1;
+
+  border:none;
+  outline:none;
+
+  padding:12px;
+
+  background:transparent;
+
+  color:white;
+  font-size:13px;
+}
+
+.chatbot-input input::placeholder{
+  color:#94a3b8;
+}
+
+.chatbot-input button{
+
+  background:linear-gradient(135deg,#6366f1,#06b6d4);
+
+  border:none;
+
+  color:white;
+
+  padding:0 16px;
+
+  cursor:pointer;
+
+  font-size:16px;
+
+  transition:0.2s;
+}
+
+.chatbot-input button:hover{
+  transform:scale(1.1);
+}
+
+/* SCROLLBAR */
+
+.chatbot-messages::-webkit-scrollbar{
+  width:5px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb{
+  background:#475569;
+  border-radius:10px;
+}
+
+/* ANIMATIONS */
+
+@keyframes slideUp{
+  from{
+    transform:translateY(30px);
+    opacity:0;
+  }
+  to{
+    transform:translateY(0);
+    opacity:1;
+  }
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}

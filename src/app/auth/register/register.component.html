@@ -1,0 +1,139 @@
+<div class="auth-wrapper">
+  <a routerLink="/" class="back-link">← Back to Home</a>
+
+  <div class="auth-card">
+
+    <div class="auth-header">
+      <div class="auth-logo">✈</div>
+      <h2>Join TravelMatch</h2>
+      <p>Create your profile to start finding travel partners</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-grid">
+
+        <!-- NAME -->
+
+        <div class="form-group">
+          <label>Full Name</label>
+
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input formControlName="name" placeholder="John Doe" />
+          </div>
+
+          <small *ngIf="registerForm.get('name')?.touched && registerForm.get('name')?.invalid">
+            Name must be at least 3 characters
+          </small>
+
+        </div>
+
+
+        <!-- EMAIL -->
+
+        <div class="form-group">
+          <label>Email Address</label>
+
+          <div class="input-wrapper">
+            <span class="input-icon">✉</span>
+            <input type="email" formControlName="email" placeholder="john@example.com" />
+          </div>
+
+          <small *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+            Enter a valid email
+          </small>
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="form-group">
+          <label>Password</label>
+
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input type="password" formControlName="password" placeholder="••••••••" />
+          </div>
+
+          <small *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
+            Password must be at least 6 characters
+          </small>
+
+        </div>
+
+
+        <!-- CITY -->
+
+        <div class="form-group">
+          <label>City</label>
+
+          <div class="input-wrapper">
+            <span class="input-icon">📍</span>
+            <input formControlName="city" placeholder="Mumbai" />
+          </div>
+
+        </div>
+
+
+        <!-- AGE -->
+
+        <div class="form-group">
+          <label>Age</label>
+
+          <div class="input-wrapper">
+            <span class="input-icon">🎂</span>
+            <input type="number" formControlName="age" placeholder="25" />
+          </div>
+
+        </div>
+
+
+        <!-- GENDER -->
+
+        <div class="form-group">
+          <label>Gender</label>
+
+          <div class="input-wrapper">
+            <span class="input-icon">🚻</span>
+
+            <select class="custom-select" formControlName="gender">
+
+              <option value="">Select Gender</option>
+
+              <option value="Male">Male</option>
+
+              <option value="Female">Female</option>
+
+              <option value="Other">Other</option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="submit"
+        class="btn-auth"
+        [disabled]="registerForm.invalid"
+      >
+        Create Account
+      </button>
+
+    </form>
+
+
+    <div class="auth-footer">
+      <p>
+        Already have an account?
+        <a routerLink="/login" class="link-highlight">Login here</a>
+      </p>
+    </div>
+
+  </div>
+</div>

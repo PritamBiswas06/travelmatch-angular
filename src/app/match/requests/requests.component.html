@@ -1,0 +1,51 @@
+<div class="page-wrapper">
+  <header class="page-header">
+    <a routerLink="/dashboard" class="back-link">← Back to Dashboard</a>
+    <h1>Match <span class="highlight">Requests</span></h1>
+    <p>Manage people who want to join your journey.</p>
+  </header>
+
+  <main class="requests-container">
+    <div class="empty-state" *ngIf="requests.length === 0">
+      <div class="empty-icon">📩</div>
+      <h3>Your inbox is quiet</h3>
+      <p>When other travelers find your plan, their requests will appear here.</p>
+    </div>
+
+    <div class="requests-list" *ngIf="requests.length > 0">
+      <div class="request-card" *ngFor="let req of requests">
+        
+        <div class="card-left">
+          <div class="avatar-circle">{{req.sender.name[0]}}</div>
+          <div class="sender-info">
+            <h3>{{req.sender.name}}</h3>
+            <span class="status-badge" [ngClass]="req.status.toLowerCase()">
+              {{req.status}}
+            </span>
+          </div>
+        </div>
+
+        <div class="card-center">
+          <div class="trip-preview">
+            <span class="label">Trip to</span>
+            <p class="destination">{{req.travelPlan.destination}}</p>
+            <span class="dates">📅 {{req.travelPlan.startDate}} - {{req.travelPlan.endDate}}</span>
+          </div>
+        </div>
+
+        <div class="card-right">
+          <div class="action-group" *ngIf="req.status === 'PENDING'">
+            <button class="btn-accept" (click)="accept(req.id)">Accept</button>
+            <button class="btn-reject" (click)="reject(req.id)">Reject</button>
+          </div>
+
+          <div class="final-status" *ngIf="req.status !== 'PENDING'">
+            <span *ngIf="req.status === 'ACCEPTED'">Partnership started! 🎉</span>
+            <span *ngIf="req.status === 'REJECTED'" class="text-muted">Request declined</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>

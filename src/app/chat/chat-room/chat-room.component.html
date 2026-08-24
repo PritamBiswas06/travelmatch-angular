@@ -1,0 +1,42 @@
+<div class="chat-wrapper">
+  <header class="chat-header">
+    <a routerLink="/partners" class="back-link">←</a>
+    <div class="partner-info">
+      <div class="avatar-sm">💬</div>
+      <div>
+        <h2>Travel Chat</h2>
+        <span class="online-indicator">Online</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="chat-box" #scrollContainer>
+    <div *ngIf="messages.length === 0" class="empty-chat">
+      <p>No messages yet. Say hello to start planning!</p>
+    </div>
+
+    <div *ngFor="let msg of messages" 
+         class="message-wrapper" 
+         [ngClass]="{'sent': isMyMessage(msg), 'received': !isMyMessage(msg)}">
+      
+      <div class="message-bubble">
+        <small class="sender-name" *ngIf="!isMyMessage(msg)">{{msg.sender.name}}</small>
+        <p class="content">{{msg.content}}</p>
+        <span class="timestamp">Just now</span>
+      </div>
+    </div>
+  </main>
+
+  <footer class="chat-input-area">
+    <div class="input-container">
+      <input
+        [(ngModel)]="newMessage"
+        placeholder="Type your travel plans..."
+        (keyup.enter)="send()"
+      />
+      <button class="btn-send" (click)="send()" [disabled]="!newMessage.trim()">
+        <span class="send-icon">➤</span>
+      </button>
+    </div>
+  </footer>
+</div>
