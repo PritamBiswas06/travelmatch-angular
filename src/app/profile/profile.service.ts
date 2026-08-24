@@ -81,6 +81,10 @@ export class ProfileService {
     return this.http.get<UserProfile>(`${this.baseUrl}/${userId}/profile`);
   }
 
+  deleteTravelPlan(planId: number): Observable<void> {
+  return this.http.delete<void>(`${API_BASE_URL}/travel/${planId}`);
+}
+
   updateMyProfile(data: UpdateProfileRequest): Observable<UserProfile> {
     return this.http.put<UserProfile>(`${this.baseUrl}/me/profile`, data);
   }
@@ -96,4 +100,5 @@ export class ProfileService {
   removeProfilePhoto(): Observable<UserProfile> {
     return this.http.delete<UserProfile>(`${this.baseUrl}/me/profile/photo`);
   }
+  
 }

@@ -47,11 +47,18 @@
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* HERO (view mode header) */
+/* HERO */
 
 .profile-card.hero {
   display: flex;
@@ -160,7 +167,7 @@
   margin-top: 14px;
 }
 
-/* INFO CARDS (view mode sections) */
+/* INFO CARDS */
 
 .info-card h3 {
   font-size: 13px;
@@ -333,7 +340,7 @@
   font-size: 12px;
 }
 
-/* CHIP SELECT (multi-select toggle buttons) */
+/* CHIP SELECT */
 
 .chip-select {
   display: flex;
@@ -420,6 +427,33 @@
   color: #fca5a5;
 }
 
+/* DELETE TRIP */
+
+.delete-trip-btn {
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  background: rgba(248, 113, 113, 0.06);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-trip-btn:hover:not(:disabled) {
+  color: #fecaca;
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.45);
+  transform: translateY(-1px);
+}
+
+.delete-trip-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* EDIT ACTIONS */
 
 .edit-actions {
@@ -499,10 +533,28 @@
   border-radius: 20px;
 }
 
+/* TRIP ACTIONS */
+
 .trip-actions {
   display: flex;
+  align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
+
+.trip-actions .secondary-btn {
+  flex: 1;
+}
+
+.trip-actions .match-btn {
+  flex: 1.4;
+}
+
+.trip-actions .delete-trip-btn {
+  flex: 0 0 auto;
+}
+
+/* BUTTONS */
 
 .secondary-btn {
   flex: 1;
@@ -580,7 +632,7 @@
   font-size: 13px;
 }
 
-/* STATE MESSAGES (not found / error) */
+/* STATE MESSAGES */
 
 .state-message {
   text-align: center;
@@ -647,22 +699,54 @@
 .skeleton-line {
   height: 14px;
   border-radius: 8px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 37%, rgba(255,255,255,0.04) 63%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.09) 37%,
+    rgba(255, 255, 255, 0.04) 63%
+  );
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
 }
 
-.skeleton-line.w-30 { width: 30%; }
-.skeleton-line.w-40 { width: 40%; }
-.skeleton-line.w-50 { width: 50%; }
-.skeleton-line.w-100 { width: 100%; }
-.skeleton-line.tall { height: 26px; }
-.skeleton-line.round { border-radius: 50%; width: 96px; height: 96px; }
-.skeleton-line.center { margin: 0 auto; }
+.skeleton-line.w-30 {
+  width: 30%;
+}
+
+.skeleton-line.w-40 {
+  width: 40%;
+}
+
+.skeleton-line.w-50 {
+  width: 50%;
+}
+
+.skeleton-line.w-100 {
+  width: 100%;
+}
+
+.skeleton-line.tall {
+  height: 26px;
+}
+
+.skeleton-line.round {
+  border-radius: 50%;
+  width: 96px;
+  height: 96px;
+}
+
+.skeleton-line.center {
+  margin: 0 auto;
+}
 
 @keyframes shimmer {
-  0% { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
 }
 
 /* TOAST */
@@ -684,7 +768,7 @@
   text-align: center;
 }
 
-/* MODAL (same pattern as Feed's View Trip modal) */
+/* MODAL */
 
 .modal-backdrop {
   position: fixed;
@@ -778,6 +862,7 @@
 }
 
 /* TABLET */
+
 @media (max-width: 1024px) {
   .profile-wrapper {
     padding: 24px;
@@ -785,6 +870,7 @@
 }
 
 /* MOBILE */
+
 @media (max-width: 768px) {
   .profile-wrapper {
     padding: 20px;
@@ -804,6 +890,14 @@
 
   .trip-actions {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .trip-actions .secondary-btn,
+  .trip-actions .match-btn,
+  .trip-actions .delete-trip-btn {
+    width: 100%;
+    flex: none;
   }
 
   .trip-route {
@@ -827,6 +921,7 @@
 }
 
 /* SMALL MOBILE */
+
 @media (max-width: 480px) {
   .profile-wrapper {
     padding: 16px;

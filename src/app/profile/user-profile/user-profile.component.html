@@ -23,419 +23,1162 @@
   <div class="state-message" *ngIf="!loading && error">
     <div class="state-icon">⚠️</div>
     <h2>Unable to load this profile.</h2>
-    <p>Something went wrong while fetching this traveler's profile. Please try again.</p>
+    <p>
+      Something went wrong while fetching this traveler's profile.
+      Please try again.
+    </p>
     <button class="primary-btn" (click)="loadProfile()">Try Again</button>
   </div>
 
   <!-- PROFILE -->
-  <div class="profile-content" *ngIf="!loading && !error && !notFound && profile">
+  <div
+    class="profile-content"
+    *ngIf="!loading && !error && !notFound && profile"
+  >
 
     <!-- ==================== VIEW MODE ==================== -->
     <ng-container *ngIf="!isEditing">
 
+      <!-- PROFILE HERO -->
       <div class="profile-card hero">
+
         <div class="avatar-wrap">
-          <div class="avatar xxlarge" *ngIf="!profile.profilePhotoUrl">{{ initials(profile.name) }}</div>
-          <img class="avatar-img xxlarge" *ngIf="profile.profilePhotoUrl" [src]="profile.profilePhotoUrl" alt="{{ profile.name }}'s profile photo" />
+
+          <div
+            class="avatar xxlarge"
+            *ngIf="!profile.profilePhotoUrl"
+          >
+            {{ initials(profile.name) }}
+          </div>
+
+          <img
+            class="avatar-img xxlarge"
+            *ngIf="profile.profilePhotoUrl"
+            [src]="profile.profilePhotoUrl"
+            alt="{{ profile.name }}'s profile photo"
+          />
+
         </div>
 
         <div class="name-row center">
+
           <h1>{{ profile.name }}</h1>
-          <span class="verified-badge" *ngIf="profile.verified">✓ Verified Traveler</span>
+
+          <span
+            class="verified-badge"
+            *ngIf="profile.verified"
+          >
+            ✓ Verified Traveler
+          </span>
+
         </div>
 
-        <span class="location-line" *ngIf="profile.city || profile.state || profile.country">
+        <span
+          class="location-line"
+          *ngIf="profile.city || profile.state || profile.country"
+        >
           📍 {{ locationLine(profile) }}
         </span>
 
-        <span class="username-line" *ngIf="profile.username">&#64;{{ profile.username }}</span>
+        <span
+          class="username-line"
+          *ngIf="profile.username"
+        >
+          &#64;{{ profile.username }}
+        </span>
 
-        <p class="bio-quote" *ngIf="profile.bio">"{{ profile.bio }}"</p>
-        <p class="bio-quote empty" *ngIf="!profile.bio && profile.isOwnProfile">
+        <p
+          class="bio-quote"
+          *ngIf="profile.bio"
+        >
+          "{{ profile.bio }}"
+        </p>
+
+        <p
+          class="bio-quote empty"
+          *ngIf="!profile.bio && profile.isOwnProfile"
+        >
           Add a short bio so other travelers get to know you.
         </p>
 
-        <button class="primary-btn edit-btn" *ngIf="profile.isOwnProfile" (click)="startEditing()">
+        <!-- EDIT PROFILE -->
+        <button
+          class="primary-btn edit-btn"
+          *ngIf="profile.isOwnProfile"
+          (click)="startEditing()"
+        >
           Edit Profile
         </button>
+
       </div>
 
-      <div class="info-card" *ngIf="profile.travelStyle.length > 0">
+      <!-- TRAVEL STYLE -->
+      <div
+        class="info-card"
+        *ngIf="profile.travelStyle.length > 0"
+      >
         <h3>Travel Style</h3>
+
         <div class="tag-row">
-          <span class="tag" *ngFor="let style of profile.travelStyle">{{ style }}</span>
+          <span
+            class="tag"
+            *ngFor="let style of profile.travelStyle"
+          >
+            {{ style }}
+          </span>
         </div>
       </div>
 
-      <div class="info-card" *ngIf="profile.travelInterests.length > 0">
+      <!-- TRAVEL INTERESTS -->
+      <div
+        class="info-card"
+        *ngIf="profile.travelInterests.length > 0"
+      >
         <h3>Travel Interests</h3>
+
         <div class="tag-row">
-          <span class="tag" *ngFor="let interest of profile.travelInterests">{{ interest }}</span>
+          <span
+            class="tag"
+            *ngFor="let interest of profile.travelInterests"
+          >
+            {{ interest }}
+          </span>
         </div>
       </div>
 
-      <div class="info-card" *ngIf="profile.preferredDestinations.length > 0">
+      <!-- PREFERRED DESTINATIONS -->
+      <div
+        class="info-card"
+        *ngIf="profile.preferredDestinations.length > 0"
+      >
         <h3>Preferred Destinations</h3>
+
         <div class="tag-row">
-          <span class="tag" *ngFor="let dest of profile.preferredDestinations">{{ dest }}</span>
+          <span
+            class="tag"
+            *ngFor="let dest of profile.preferredDestinations"
+          >
+            {{ dest }}
+          </span>
         </div>
       </div>
 
-      <div class="info-card" *ngIf="profile.budgetPreference || profile.travelFrequency || profile.languages.length > 0">
+      <!-- TRAVEL PREFERENCES -->
+      <div
+        class="info-card"
+        *ngIf="
+          profile.budgetPreference ||
+          profile.travelFrequency ||
+          profile.languages.length > 0
+        "
+      >
+
         <h3>Travel Preferences</h3>
+
         <div class="pref-list">
-          <div class="pref-row" *ngIf="profile.budgetPreference">
+
+          <div
+            class="pref-row"
+            *ngIf="profile.budgetPreference"
+          >
             <span class="pref-icon">💰</span>
-            <span>Budget: {{ profile.budgetPreference }}</span>
+            <span>
+              Budget: {{ profile.budgetPreference }}
+            </span>
           </div>
-          <div class="pref-row" *ngIf="profile.travelFrequency">
+
+          <div
+            class="pref-row"
+            *ngIf="profile.travelFrequency"
+          >
             <span class="pref-icon">✈️</span>
-            <span>Frequency: {{ profile.travelFrequency }}</span>
+            <span>
+              Frequency: {{ profile.travelFrequency }}
+            </span>
           </div>
-          <div class="pref-row" *ngIf="profile.languages.length > 0">
+
+          <div
+            class="pref-row"
+            *ngIf="profile.languages.length > 0"
+          >
             <span class="pref-icon">🗣</span>
-            <span>Languages: {{ profile.languages.join(', ') }}</span>
+            <span>
+              Languages: {{ profile.languages.join(', ') }}
+            </span>
           </div>
+
         </div>
+
       </div>
 
-      <div class="info-card" *ngIf="profile.idealTravelPartner">
+      <!-- IDEAL TRAVEL PARTNER -->
+      <div
+        class="info-card"
+        *ngIf="profile.idealTravelPartner"
+      >
         <h3>Ideal Travel Partner</h3>
         <p>{{ profile.idealTravelPartner }}</p>
       </div>
 
-      <div class="info-card" *ngIf="profile.instagramUrl || profile.linkedinUrl || profile.websiteUrl">
+      <!-- SOCIAL LINKS -->
+      <div
+        class="info-card"
+        *ngIf="
+          profile.instagramUrl ||
+          profile.linkedinUrl ||
+          profile.websiteUrl
+        "
+      >
+
         <h3>Links</h3>
+
         <div class="social-links">
-          <a *ngIf="profile.instagramUrl" [href]="profile.instagramUrl" target="_blank" rel="noopener">📷 Instagram</a>
-          <a *ngIf="profile.linkedinUrl" [href]="profile.linkedinUrl" target="_blank" rel="noopener">💼 LinkedIn</a>
-          <a *ngIf="profile.websiteUrl" [href]="profile.websiteUrl" target="_blank" rel="noopener">🔗 Website</a>
+
+          <a
+            *ngIf="profile.instagramUrl"
+            [href]="profile.instagramUrl"
+            target="_blank"
+            rel="noopener"
+          >
+            📷 Instagram
+          </a>
+
+          <a
+            *ngIf="profile.linkedinUrl"
+            [href]="profile.linkedinUrl"
+            target="_blank"
+            rel="noopener"
+          >
+            💼 LinkedIn
+          </a>
+
+          <a
+            *ngIf="profile.websiteUrl"
+            [href]="profile.websiteUrl"
+            target="_blank"
+            rel="noopener"
+          >
+            🔗 Website
+          </a>
+
         </div>
+
       </div>
 
-      <!-- UPCOMING TRIPS -->
+      <!-- ==================== UPCOMING TRIPS ==================== -->
+
       <div class="trips-section">
+
         <h2>Upcoming Trips</h2>
 
-        <div class="no-trips" *ngIf="profile.upcomingTrips.length === 0">
-          <div class="state-icon small">🗺️</div>
+        <!-- NO TRIPS -->
+        <div
+          class="no-trips"
+          *ngIf="profile.upcomingTrips.length === 0"
+        >
+
+          <div class="state-icon small">
+            🗺️
+          </div>
+
           <h3>No upcoming trips</h3>
-          <p>This traveler hasn't created any upcoming travel plans yet.</p>
+
+          <p>
+            This traveler hasn't created any upcoming
+            travel plans yet.
+          </p>
+
         </div>
 
-        <div class="trips-grid" *ngIf="profile.upcomingTrips.length > 0">
-          <article class="trip-card" *ngFor="let trip of profile.upcomingTrips; trackBy: trackByTripId">
+        <!-- TRIPS -->
+        <div
+          class="trips-grid"
+          *ngIf="profile.upcomingTrips.length > 0"
+        >
 
+          <article
+            class="trip-card"
+            *ngFor="
+              let trip of profile.upcomingTrips;
+              trackBy: trackByTripId
+            "
+          >
+
+            <!-- ROUTE -->
             <div class="trip-route">
+
               <div class="route-point">
-                <h3>{{ trip.fromLocation }}</h3>
-                <small>Departure</small>
+
+                <h3>
+                  {{ trip.fromLocation }}
+                </h3>
+
+                <small>
+                  Departure
+                </small>
+
               </div>
-              <div class="plane">✈️</div>
+
+              <div class="plane">
+                ✈️
+              </div>
+
               <div class="route-point align-right">
-                <h3>{{ trip.destination }}</h3>
-                <small>Destination</small>
+
+                <h3>
+                  {{ trip.destination }}
+                </h3>
+
+                <small>
+                  Destination
+                </small>
+
               </div>
+
             </div>
 
+            <!-- META -->
             <div class="meta">
-              <span>📅 {{ trip.startDate | date:'mediumDate' }}</span>
-              <span>💰 ₹{{ trip.budget | number }}</span>
-              <span class="type-tag">🧳 {{ trip.travelType }}</span>
+
+              <span>
+                📅 {{ trip.startDate | date:'mediumDate' }}
+              </span>
+
+              <span>
+                💰 ₹{{ trip.budget | number }}
+              </span>
+
+              <span class="type-tag">
+                🧳 {{ trip.travelType }}
+              </span>
+
             </div>
 
+            <!-- ACTIONS -->
             <div class="trip-actions">
-              <button class="secondary-btn" (click)="openTrip(trip)">View Trip</button>
 
+              <!-- VIEW TRIP -->
               <button
+                type="button"
+                class="secondary-btn"
+                (click)="openTrip(trip)"
+              >
+                View Trip
+              </button>
+
+              <!-- DELETE ONLY ON OWN PROFILE -->
+              <button
+                type="button"
+                class="text-btn danger delete-trip-btn"
+                *ngIf="profile.isOwnProfile"
+                [disabled]="isPending(trip.id, 'delete')"
+                (click)="deleteTrip(trip)"
+              >
+                {{
+                  isPending(trip.id, 'delete')
+                    ? 'Deleting...'
+                    : 'Delete Trip'
+                }}
+              </button>
+
+              <!-- MATCH REQUEST FOR OTHER USERS -->
+              <button
+                type="button"
                 class="match-btn"
                 *ngIf="!profile.isOwnProfile"
-                [class.sent]="trip.matchRequestStatus === 'PENDING'"
-                [class.accepted]="trip.matchRequestStatus === 'ACCEPTED'"
-                [disabled]="trip.matchRequestStatus === 'PENDING' || trip.matchRequestStatus === 'ACCEPTED' || isPending(trip.id, 'match')"
+                [class.sent]="
+                  trip.matchRequestStatus === 'PENDING'
+                "
+                [class.accepted]="
+                  trip.matchRequestStatus === 'ACCEPTED'
+                "
+                [disabled]="
+                  trip.matchRequestStatus === 'PENDING' ||
+                  trip.matchRequestStatus === 'ACCEPTED' ||
+                  isPending(trip.id, 'match')
+                "
                 (click)="sendMatchRequest(trip)"
               >
                 {{ matchButtonLabel(trip) }}
               </button>
+
             </div>
 
           </article>
+
         </div>
+
       </div>
 
     </ng-container>
 
-    <!-- ==================== EDIT MODE ==================== -->
-    <form class="profile-card edit-card" *ngIf="isEditing" (ngSubmit)="saveProfile()">
 
-      <h2 class="edit-title">Edit Profile</h2>
+    <!-- ==================== EDIT MODE ==================== -->
+
+    <form
+      class="profile-card edit-card"
+      *ngIf="isEditing"
+      (ngSubmit)="saveProfile()"
+    >
+
+      <h2 class="edit-title">
+        Edit Profile
+      </h2>
 
       <!-- PROFILE PHOTO -->
       <section class="edit-section">
+
         <h3>Profile Photo</h3>
 
         <div class="photo-editor">
+
           <div class="avatar-wrap">
-            <img class="avatar-img large" *ngIf="photoPreviewUrl" [src]="photoPreviewUrl" alt="New photo preview" />
-            <img class="avatar-img large" *ngIf="!photoPreviewUrl && profile.profilePhotoUrl" [src]="profile.profilePhotoUrl" alt="Current profile photo" />
-            <div class="avatar large" *ngIf="!photoPreviewUrl && !profile.profilePhotoUrl">{{ initials(profile.name) }}</div>
+
+            <img
+              class="avatar-img large"
+              *ngIf="photoPreviewUrl"
+              [src]="photoPreviewUrl"
+              alt="New photo preview"
+            />
+
+            <img
+              class="avatar-img large"
+              *ngIf="
+                !photoPreviewUrl &&
+                profile.profilePhotoUrl
+              "
+              [src]="profile.profilePhotoUrl"
+              alt="Current profile photo"
+            />
+
+            <div
+              class="avatar large"
+              *ngIf="
+                !photoPreviewUrl &&
+                !profile.profilePhotoUrl
+              "
+            >
+              {{ initials(profile.name) }}
+            </div>
+
           </div>
 
           <div class="photo-actions">
+
             <label class="secondary-btn file-btn">
+
               Choose Photo
-              <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onPhotoSelected($event)" hidden />
+
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                (change)="onPhotoSelected($event)"
+                hidden
+              />
+
             </label>
 
             <ng-container *ngIf="selectedPhotoFile">
-              <button type="button" class="primary-btn" [disabled]="uploadingPhoto" (click)="savePhoto()">
-                {{ uploadingPhoto ? 'Saving...' : 'Save Photo' }}
+
+              <button
+                type="button"
+                class="primary-btn"
+                [disabled]="uploadingPhoto"
+                (click)="savePhoto()"
+              >
+                {{
+                  uploadingPhoto
+                    ? 'Saving...'
+                    : 'Save Photo'
+                }}
               </button>
-              <button type="button" class="text-btn" (click)="cancelPhotoSelection()">Cancel</button>
+
+              <button
+                type="button"
+                class="text-btn"
+                (click)="cancelPhotoSelection()"
+              >
+                Cancel
+              </button>
+
             </ng-container>
 
-            <button type="button" class="text-btn danger" *ngIf="!selectedPhotoFile && profile.profilePhotoUrl" [disabled]="uploadingPhoto" (click)="removePhoto()">
+            <button
+              type="button"
+              class="text-btn danger"
+              *ngIf="
+                !selectedPhotoFile &&
+                profile.profilePhotoUrl
+              "
+              [disabled]="uploadingPhoto"
+              (click)="removePhoto()"
+            >
               Remove Photo
             </button>
+
           </div>
+
         </div>
 
-        <p class="field-error" *ngIf="photoError">{{ photoError }}</p>
-        <p class="hint">JPEG, PNG, or WEBP. Max 2MB.</p>
+        <p
+          class="field-error"
+          *ngIf="photoError"
+        >
+          {{ photoError }}
+        </p>
+
+        <p class="hint">
+          JPEG, PNG, or WEBP. Max 2MB.
+        </p>
+
       </section>
+
 
       <!-- PERSONAL INFORMATION -->
       <section class="edit-section">
+
         <h3>Personal Information</h3>
 
         <div class="form-grid">
+
           <label>
             Full Name
-            <input type="text" [(ngModel)]="editModel.name" name="name" required />
+
+            <input
+              type="text"
+              [(ngModel)]="editModel.name"
+              name="name"
+              required
+            />
           </label>
 
           <label>
             Username
-            <input type="text" [(ngModel)]="editModel.username" name="username" placeholder="e.g. pritam_travels" />
+
+            <input
+              type="text"
+              [(ngModel)]="editModel.username"
+              name="username"
+              placeholder="e.g. pritam_travels"
+            />
           </label>
 
           <label>
             Age
-            <input type="number" [(ngModel)]="editModel.age" name="age" min="1" max="120" />
+
+            <input
+              type="number"
+              [(ngModel)]="editModel.age"
+              name="age"
+              min="1"
+              max="120"
+            />
           </label>
 
           <label>
             Gender
-            <input type="text" [(ngModel)]="editModel.gender" name="gender" placeholder="e.g. Male, Female, Non-binary" />
+
+            <input
+              type="text"
+              [(ngModel)]="editModel.gender"
+              name="gender"
+              placeholder="e.g. Male, Female, Non-binary"
+            />
           </label>
 
           <label>
             City
-            <input type="text" [(ngModel)]="editModel.city" name="city" placeholder="e.g. Kolkata" />
+
+            <input
+              type="text"
+              [(ngModel)]="editModel.city"
+              name="city"
+              placeholder="e.g. Kolkata"
+            />
           </label>
 
           <label>
             State
-            <input type="text" [(ngModel)]="editModel.state" name="state" placeholder="e.g. West Bengal" />
+
+            <input
+              type="text"
+              [(ngModel)]="editModel.state"
+              name="state"
+              placeholder="e.g. West Bengal"
+            />
           </label>
 
           <label class="span-2">
             Country
-            <input type="text" [(ngModel)]="editModel.country" name="country" placeholder="e.g. India" />
+
+            <input
+              type="text"
+              [(ngModel)]="editModel.country"
+              name="country"
+              placeholder="e.g. India"
+            />
           </label>
 
           <label class="span-2">
             Bio
-            <textarea [(ngModel)]="editModel.bio" name="bio" rows="3" maxlength="500"
-                      placeholder="Tell fellow travelers a bit about yourself"></textarea>
-            <small class="char-count">{{ editModel.bio.length }}/500</small>
+
+            <textarea
+              [(ngModel)]="editModel.bio"
+              name="bio"
+              rows="3"
+              maxlength="500"
+              placeholder="Tell fellow travelers a bit about yourself"
+            ></textarea>
+
+            <small class="char-count">
+              {{ editModel.bio.length }}/500
+            </small>
+
           </label>
+
         </div>
+
       </section>
+
 
       <!-- TRAVEL STYLE -->
       <section class="edit-section">
+
         <h3>Travel Style</h3>
+
         <div class="chip-select">
-          <button type="button" class="chip-option" *ngFor="let style of travelStyleOptions"
-                  [class.selected]="editTravelStyle.includes(style)"
-                  (click)="toggleTravelStyle(style)">
+
+          <button
+            type="button"
+            class="chip-option"
+            *ngFor="let style of travelStyleOptions"
+            [class.selected]="
+              editTravelStyle.includes(style)
+            "
+            (click)="toggleTravelStyle(style)"
+          >
             {{ style }}
           </button>
+
         </div>
+
       </section>
+
 
       <!-- TRAVEL INTERESTS -->
       <section class="edit-section">
+
         <h3>Travel Interests</h3>
+
         <div class="chip-select">
-          <button type="button" class="chip-option" *ngFor="let interest of travelInterestOptions"
-                  [class.selected]="editTravelInterests.includes(interest)"
-                  (click)="toggleTravelInterest(interest)">
+
+          <button
+            type="button"
+            class="chip-option"
+            *ngFor="let interest of travelInterestOptions"
+            [class.selected]="
+              editTravelInterests.includes(interest)
+            "
+            (click)="toggleTravelInterest(interest)"
+          >
             {{ interest }}
           </button>
+
         </div>
+
       </section>
+
 
       <!-- PREFERRED DESTINATIONS -->
       <section class="edit-section">
+
         <h3>Preferred Destinations</h3>
-        <div class="tag-row" *ngIf="editPreferredDestinations.length > 0">
-          <span class="tag removable" *ngFor="let dest of editPreferredDestinations">
+
+        <div
+          class="tag-row"
+          *ngIf="editPreferredDestinations.length > 0"
+        >
+
+          <span
+            class="tag removable"
+            *ngFor="
+              let dest of editPreferredDestinations
+            "
+          >
+
             {{ dest }}
-            <button type="button" (click)="removeDestination(dest)">✕</button>
+
+            <button
+              type="button"
+              (click)="removeDestination(dest)"
+            >
+              ✕
+            </button>
+
           </span>
+
         </div>
+
         <div class="tag-input-row">
-          <input type="text" [(ngModel)]="destinationInput" name="destinationInput"
-                 placeholder="e.g. Goa" (keydown.enter)="$event.preventDefault(); addDestination()" />
-          <button type="button" class="secondary-btn" (click)="addDestination()">Add</button>
+
+          <input
+            type="text"
+            [(ngModel)]="destinationInput"
+            name="destinationInput"
+            placeholder="e.g. Goa"
+            (keydown.enter)="
+              $event.preventDefault();
+              addDestination()
+            "
+          />
+
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="addDestination()"
+          >
+            Add
+          </button>
+
         </div>
+
       </section>
+
 
       <!-- BUDGET & FREQUENCY -->
       <section class="edit-section">
+
         <h3>Travel Preferences</h3>
 
         <div class="form-grid">
+
           <label>
             Budget
-            <select [ngModel]="budgetIsCustom ? 'Custom' : editModel.budgetPreference"
-                    (ngModelChange)="onBudgetSelectChange($event)" name="budgetSelect">
-              <option value="">Select a budget range</option>
-              <option *ngFor="let option of budgetOptions" [value]="option">{{ option }}</option>
-              <option value="Custom">Custom</option>
+
+            <select
+              [ngModel]="
+                budgetIsCustom
+                  ? 'Custom'
+                  : editModel.budgetPreference
+              "
+              (ngModelChange)="
+                onBudgetSelectChange($event)
+              "
+              name="budgetSelect"
+            >
+
+              <option value="">
+                Select a budget range
+              </option>
+
+              <option
+                *ngFor="let option of budgetOptions"
+                [value]="option"
+              >
+                {{ option }}
+              </option>
+
+              <option value="Custom">
+                Custom
+              </option>
+
             </select>
+
           </label>
 
           <label *ngIf="budgetIsCustom">
+
             Custom Budget
-            <input type="text" [(ngModel)]="editModel.budgetPreference" name="customBudget" placeholder="e.g. ₹15,000 - ₹18,000" />
+
+            <input
+              type="text"
+              [(ngModel)]="
+                editModel.budgetPreference
+              "
+              name="customBudget"
+              placeholder="e.g. ₹15,000 - ₹18,000"
+            />
+
           </label>
 
           <label>
+
             Travel Frequency
-            <select [(ngModel)]="editModel.travelFrequency" name="travelFrequency">
-              <option value="">Select frequency</option>
-              <option *ngFor="let option of frequencyOptions" [value]="option">{{ option }}</option>
+
+            <select
+              [(ngModel)]="
+                editModel.travelFrequency
+              "
+              name="travelFrequency"
+            >
+
+              <option value="">
+                Select frequency
+              </option>
+
+              <option
+                *ngFor="let option of frequencyOptions"
+                [value]="option"
+              >
+                {{ option }}
+              </option>
+
             </select>
+
           </label>
+
         </div>
 
-        <h3 class="sub-heading">Languages</h3>
+        <h3 class="sub-heading">
+          Languages
+        </h3>
+
         <div class="chip-select">
-          <button type="button" class="chip-option" *ngFor="let lang of languageOptions"
-                  [class.selected]="editLanguages.includes(lang)"
-                  (click)="toggleLanguage(lang)">
+
+          <button
+            type="button"
+            class="chip-option"
+            *ngFor="let lang of languageOptions"
+            [class.selected]="
+              editLanguages.includes(lang)
+            "
+            (click)="toggleLanguage(lang)"
+          >
             {{ lang }}
           </button>
+
         </div>
+
       </section>
+
 
       <!-- IDEAL TRAVEL PARTNER -->
       <section class="edit-section">
+
         <h3>Ideal Travel Partner</h3>
-        <textarea [(ngModel)]="editModel.idealTravelPartner" name="idealTravelPartner" rows="3" maxlength="500"
-                  placeholder="Describe the kind of travel partner you're looking for"></textarea>
-        <small class="char-count">{{ editModel.idealTravelPartner.length }}/500</small>
+
+        <textarea
+          [(ngModel)]="
+            editModel.idealTravelPartner
+          "
+          name="idealTravelPartner"
+          rows="3"
+          maxlength="500"
+          placeholder="Describe the kind of travel partner you're looking for"
+        ></textarea>
+
+        <small class="char-count">
+          {{ editModel.idealTravelPartner.length }}/500
+        </small>
+
       </section>
+
 
       <!-- SOCIAL LINKS -->
       <section class="edit-section">
+
         <h3>Optional Public Links</h3>
+
         <div class="form-grid">
+
           <label>
+
             Instagram
-            <input type="url" [(ngModel)]="editModel.instagramUrl" name="instagramUrl" placeholder="https://instagram.com/yourhandle" />
+
+            <input
+              type="url"
+              [(ngModel)]="
+                editModel.instagramUrl
+              "
+              name="instagramUrl"
+              placeholder="https://instagram.com/yourhandle"
+            />
+
           </label>
+
           <label>
+
             LinkedIn
-            <input type="url" [(ngModel)]="editModel.linkedinUrl" name="linkedinUrl" placeholder="https://linkedin.com/in/yourname" />
+
+            <input
+              type="url"
+              [(ngModel)]="
+                editModel.linkedinUrl
+              "
+              name="linkedinUrl"
+              placeholder="https://linkedin.com/in/yourname"
+            />
+
           </label>
+
           <label class="span-2">
+
             Website
-            <input type="url" [(ngModel)]="editModel.websiteUrl" name="websiteUrl" placeholder="https://yourwebsite.com" />
+
+            <input
+              type="url"
+              [(ngModel)]="
+                editModel.websiteUrl
+              "
+              name="websiteUrl"
+              placeholder="https://yourwebsite.com"
+            />
+
           </label>
+
         </div>
+
       </section>
 
+
+      <!-- EDIT ACTIONS -->
       <div class="edit-actions">
-        <button type="button" class="secondary-btn" (click)="cancelEditing()">Cancel</button>
-        <button type="submit" class="primary-btn" [disabled]="savingProfile">
-          {{ savingProfile ? 'Saving...' : 'Save Changes' }}
+
+        <button
+          type="button"
+          class="secondary-btn"
+          (click)="cancelEditing()"
+        >
+          Cancel
         </button>
+
+        <button
+          type="submit"
+          class="primary-btn"
+          [disabled]="savingProfile"
+        >
+          {{
+            savingProfile
+              ? 'Saving...'
+              : 'Save Changes'
+          }}
+        </button>
+
       </div>
 
     </form>
 
   </div>
 
+
   <!-- TOAST -->
-  <div class="toast" *ngIf="toastMessage">{{ toastMessage }}</div>
+  <div
+    class="toast"
+    *ngIf="toastMessage"
+  >
+    {{ toastMessage }}
+  </div>
 
-  <!-- VIEW TRIP MODAL -->
-  <div class="modal-backdrop" *ngIf="selectedTrip" (click)="closeTrip()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
 
-      <button class="modal-close" (click)="closeTrip()">✕</button>
+  <!-- ==================== VIEW TRIP MODAL ==================== -->
 
-      <div class="user-block" *ngIf="profile">
-        <div class="avatar" *ngIf="!profile.profilePhotoUrl">{{ initials(profile.name) }}</div>
-        <img class="avatar-img" *ngIf="profile.profilePhotoUrl" [src]="profile.profilePhotoUrl" alt="{{ profile.name }}" />
+  <div
+    class="modal-backdrop"
+    *ngIf="selectedTrip"
+    (click)="closeTrip()"
+  >
+
+    <div
+      class="modal-card"
+      (click)="$event.stopPropagation()"
+    >
+
+      <button
+        class="modal-close"
+        type="button"
+        (click)="closeTrip()"
+      >
+        ✕
+      </button>
+
+      <!-- USER -->
+      <div
+        class="user-block"
+        *ngIf="profile"
+      >
+
+        <div
+          class="avatar"
+          *ngIf="!profile.profilePhotoUrl"
+        >
+          {{ initials(profile.name) }}
+        </div>
+
+        <img
+          class="avatar-img"
+          *ngIf="profile.profilePhotoUrl"
+          [src]="profile.profilePhotoUrl"
+          alt="{{ profile.name }}"
+        />
+
         <div class="user-meta">
-          <span class="user-name">{{ profile.name }}</span>
-          <span class="user-city" *ngIf="profile.city">{{ profile.city }}</span>
+
+          <span class="user-name">
+            {{ profile.name }}
+          </span>
+
+          <span
+            class="user-city"
+            *ngIf="profile.city"
+          >
+            {{ profile.city }}
+          </span>
+
         </div>
+
       </div>
 
+
+      <!-- ROUTE -->
       <div class="trip-route modal-route">
+
         <div class="route-point">
-          <h3>{{ selectedTrip.fromLocation }}</h3>
-          <small>Departure</small>
+
+          <h3>
+            {{ selectedTrip.fromLocation }}
+          </h3>
+
+          <small>
+            Departure
+          </small>
+
         </div>
-        <div class="plane">✈️</div>
+
+        <div class="plane">
+          ✈️
+        </div>
+
         <div class="route-point align-right">
-          <h3>{{ selectedTrip.destination }}</h3>
-          <small>Destination</small>
+
+          <h3>
+            {{ selectedTrip.destination }}
+          </h3>
+
+          <small>
+            Destination
+          </small>
+
         </div>
+
       </div>
 
+
+      <!-- DETAILS -->
       <div class="modal-details">
+
         <div class="detail-row">
-          <span class="label">Start Date</span>
-          <span class="value">{{ selectedTrip.startDate | date:'mediumDate' }}</span>
+
+          <span class="label">
+            Start Date
+          </span>
+
+          <span class="value">
+            {{ selectedTrip.startDate | date:'mediumDate' }}
+          </span>
+
         </div>
+
         <div class="detail-row">
-          <span class="label">End Date</span>
-          <span class="value">{{ selectedTrip.endDate | date:'mediumDate' }}</span>
+
+          <span class="label">
+            End Date
+          </span>
+
+          <span class="value">
+            {{ selectedTrip.endDate | date:'mediumDate' }}
+          </span>
+
         </div>
+
         <div class="detail-row">
-          <span class="label">Budget</span>
-          <span class="value">₹{{ selectedTrip.budget | number }}</span>
+
+          <span class="label">
+            Budget
+          </span>
+
+          <span class="value">
+            ₹{{ selectedTrip.budget | number }}
+          </span>
+
         </div>
+
         <div class="detail-row">
-          <span class="label">Travel Type</span>
-          <span class="value">{{ selectedTrip.travelType }}</span>
+
+          <span class="label">
+            Travel Type
+          </span>
+
+          <span class="value">
+            {{ selectedTrip.travelType }}
+          </span>
+
         </div>
+
         <div class="detail-row">
-          <span class="label">Status</span>
-          <span class="value">{{ selectedTrip.status | titlecase }}</span>
+
+          <span class="label">
+            Status
+          </span>
+
+          <span class="value">
+            {{ selectedTrip.status | titlecase }}
+          </span>
+
         </div>
+
       </div>
 
-      <div class="modal-actions" *ngIf="profile && !profile.isOwnProfile">
+
+      <!-- MODAL ACTIONS FOR OTHER USERS -->
+      <div
+        class="modal-actions"
+        *ngIf="profile && !profile.isOwnProfile"
+      >
+
         <button
           class="match-btn full"
-          [class.sent]="selectedTrip.matchRequestStatus === 'PENDING'"
-          [class.accepted]="selectedTrip.matchRequestStatus === 'ACCEPTED'"
-          [disabled]="selectedTrip.matchRequestStatus === 'PENDING' || selectedTrip.matchRequestStatus === 'ACCEPTED' || isPending(selectedTrip.id, 'match')"
+          [class.sent]="
+            selectedTrip.matchRequestStatus === 'PENDING'
+          "
+          [class.accepted]="
+            selectedTrip.matchRequestStatus === 'ACCEPTED'
+          "
+          [disabled]="
+            selectedTrip.matchRequestStatus === 'PENDING' ||
+            selectedTrip.matchRequestStatus === 'ACCEPTED' ||
+            isPending(selectedTrip.id, 'match')
+          "
           (click)="sendMatchRequest(selectedTrip)"
         >
           {{ matchButtonLabel(selectedTrip) }}
         </button>
+
+      </div>
+
+
+      <!-- DELETE FOR OWNER -->
+      <div
+        class="modal-actions"
+        *ngIf="profile && profile.isOwnProfile"
+      >
+
+        <button
+          type="button"
+          class="text-btn danger delete-trip-btn"
+          [disabled]="isPending(selectedTrip.id, 'delete')"
+          (click)="deleteTrip(selectedTrip)"
+        >
+          {{
+            isPending(selectedTrip.id, 'delete')
+              ? 'Deleting...'
+              : 'Delete Trip'
+          }}
+        </button>
+
       </div>
 
     </div>
+
   </div>
 
 </div>
