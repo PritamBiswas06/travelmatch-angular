@@ -1,7 +1,8 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ChatbotComponent } from "../../travel/chatbot/chatbot.component";
+import { NotificationService } from '../../notifications/notification.service';
 
 @Component({
   selector: 'app-layout',
@@ -10,11 +11,18 @@ import { ChatbotComponent } from "../../travel/chatbot/chatbot.component";
   templateUrl: './app-layout.component.html',
   styleUrls: ['./app-layout.component.css'],
 })
-export class AppLayoutComponent {
-  constructor(private router: Router) {}
+export class AppLayoutComponent implements OnInit {
+  constructor(
+    private router: Router,
+    private notificationService: NotificationService
+  ) {}
 
   sidebarOpen = window.innerWidth > 768;
   showChatbot = false;
+
+  // Drives the 🔔 badge in the sidebar/topbar. NotificationService keeps
+  // this in sync after login, on layout load, and after any read action.
+  unreadCount$ = this.notificationService.unreadCount$;
 
   // Used by the sidebar's "Profile" link to route to the logged-in user's
   // own profile at /profile/:id, reusing the same route Feed's "View
@@ -22,6 +30,10 @@ export class AppLayoutComponent {
   get myUserId(): number | null {
     const id = localStorage.getItem('userId');
     return id ? Number(id) : null;
+  }
+
+  ngOnInit(): void {
+    this.notificationService.refreshUnreadCount();
   }
 
   toggleSidebar() {

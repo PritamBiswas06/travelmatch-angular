@@ -177,6 +177,48 @@
   z-index: 300;
 }
 
+/* ===== NOTIFICATION BADGE ===== */
+.icon-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge {
+  background: #ff4b5c;
+  color: white;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 50px;
+}
+
+.badge-icon {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  font-size: 10px;
+  min-width: 16px;
+  padding: 3px 5px;
+  text-align: center;
+}
+
+.badge-inline {
+  margin-left: 8px;
+  font-size: 11px;
+  padding: 2px 8px;
+}
+
+.mobile-notif-link {
+  position: relative;
+  margin-left: auto;
+  color: white;
+  text-decoration: none;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+}
+
 /* ===== MOBILE / TABLET ===== */
 @media (max-width: 768px) {
   .sidebar {

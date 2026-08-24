@@ -34,6 +34,16 @@
         <span class="icon">🤝</span>
         <span class="label" *ngIf="sidebarOpen">Partners</span>
       </a>
+      <a routerLink="/notifications" routerLinkActive="active">
+        <span class="icon-wrap">
+          <span class="icon">🔔</span>
+          <span class="badge badge-icon" *ngIf="(unreadCount$ | async) as count">{{ count }}</span>
+        </span>
+        <span class="label" *ngIf="sidebarOpen">
+          Notifications
+          <span class="badge badge-inline" *ngIf="(unreadCount$ | async) as count">{{ count }}</span>
+        </span>
+      </a>
     </nav>
 
     <button class="logout" (click)="logout()">
@@ -48,6 +58,10 @@
     <header class="mobile-topbar">
       <button class="mobile-menu-btn" (click)="toggleSidebar()" aria-label="Open menu">☰</button>
       <span class="mobile-topbar-title">✈ TravelMatch</span>
+      <a routerLink="/notifications" class="mobile-notif-link" aria-label="Notifications">
+        🔔
+        <span class="badge badge-icon" *ngIf="(unreadCount$ | async) as count">{{ count }}</span>
+      </a>
     </header>
 
     <main class="content">

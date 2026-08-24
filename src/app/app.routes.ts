@@ -27,6 +27,8 @@ import { authGuard } from './core/auth.guard';
 import { ChatGuard } from './guards/chat.guard';
 import { AboutComponent } from './pages/about/about.component';
 
+import { NotificationPanelComponent } from './notifications/notification-panel/notification-panel.component';
+
 export const routes: Routes = [
 
   // 🌍 Public Pages
@@ -67,6 +69,8 @@ export const routes: Routes = [
       { path: 'requests', component: RequestsComponent },
 
       { path: 'partners', component: PartnersComponent },
+
+      { path: 'notifications', component: NotificationPanelComponent },
 
       // 🔒 Chat protected with extra guard
       {

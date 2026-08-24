@@ -1,0 +1,53 @@
+<div class="page-wrapper">
+  <header class="page-header">
+    <a routerLink="/dashboard" class="back-link">← Back to Dashboard</a>
+    <h1>🔔 <span class="highlight">Notifications</span></h1>
+    <p>Stay updated on match requests, messages, and more.</p>
+
+    <button
+      class="btn-mark-all"
+      *ngIf="notifications.length > 0"
+      [disabled]="!hasUnread"
+      (click)="markAllAsRead()">
+      Mark all as read
+    </button>
+  </header>
+
+  <main class="notifications-container">
+
+    <div class="empty-state" *ngIf="!loading && notifications.length === 0">
+      <div class="empty-icon">🔔</div>
+      <h3>No notifications yet.</h3>
+      <p>You're all caught up. New notifications will show up here.</p>
+    </div>
+
+    <div class="notifications-list" *ngIf="notifications.length > 0">
+      <div
+        class="notification-card"
+        *ngFor="let n of notifications"
+        [class.unread]="!n.read"
+        (click)="openNotification(n)">
+
+        <div class="card-left">
+          <div class="avatar-circle">{{ n.senderName ? n.senderName[0] : '🔔' }}</div>
+        </div>
+
+        <div class="card-center">
+          <div class="notification-top">
+            <h3 *ngIf="n.senderName">{{ n.senderName }}</h3>
+            <span class="type-badge">{{ typeLabel(n.type) }}</span>
+          </div>
+          <p class="message">{{ n.message }}</p>
+          <span class="time">{{ n.createdAt | date:'medium' }}</span>
+        </div>
+
+        <div class="card-right">
+          <span class="dot" *ngIf="!n.read" title="Unread"></span>
+          <span class="read-label" *ngIf="n.read">Read</span>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
