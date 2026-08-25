@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../chat.service';
+import { NotificationService } from '../../notifications/notification.service';
 
 @Component({
   selector: 'app-chat-room',
@@ -21,7 +22,8 @@ export class ChatRoomComponent implements OnInit, AfterViewChecked {
 
   constructor(
     private route: ActivatedRoute,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +47,11 @@ export class ChatRoomComponent implements OnInit, AfterViewChecked {
     this.chatService.getConversation(this.userId).subscribe({
       next: (res: any) => {
         this.messages = res;
+
+        // Opening this conversation clears any unread "new message"
+        // notifications from this partner on the backend - refresh the
+        // sidebar badge so it reflects that immediately.
+        this.notificationService.refreshUnreadCount();
       },
       error: (err) => console.error("Could not load messages", err)
     });
