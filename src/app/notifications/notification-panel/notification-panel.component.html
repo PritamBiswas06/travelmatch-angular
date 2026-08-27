@@ -1,9 +1,63 @@
 <div class="page-wrapper">
   <header class="page-header">
-    <a routerLink="/dashboard" class="back-link">← Back to Dashboard</a>
+
+    <a routerLink="/dashboard" class="back-link">
+      ← Back to Dashboard
+    </a>
+
     <h1>🔔 <span class="highlight">Notifications</span></h1>
+
     <p>Stay updated on match requests, messages, and more.</p>
 
+    <!-- ==================== WEB PUSH ==================== -->
+    <div
+      class="push-banner"
+      *ngIf="pushStatus !== 'unsupported'">
+
+      <ng-container [ngSwitch]="pushStatus">
+
+        <!-- PUSH ENABLED -->
+        <ng-container *ngSwitchCase="'subscribed'">
+          <span class="push-status">
+            📱 Push notifications are on for this device
+          </span>
+
+          <button
+            type="button"
+            class="btn-push btn-push-off"
+            [disabled]="pushBusy"
+            (click)="disablePush()">
+            {{ pushBusy ? 'Turning off...' : 'Turn off' }}
+          </button>
+        </ng-container>
+
+        <!-- PUSH BLOCKED -->
+        <ng-container *ngSwitchCase="'denied'">
+          <span class="push-status push-status-denied">
+            🔕 Push notifications are blocked for TravelMatch
+            in your browser settings
+          </span>
+        </ng-container>
+
+        <!-- NOT SUBSCRIBED / DEFAULT -->
+        <ng-container *ngSwitchDefault>
+          <span class="push-status">
+            Get notified even when TravelMatch isn't open
+          </span>
+
+          <button
+            type="button"
+            class="btn-push"
+            [disabled]="pushBusy"
+            (click)="enablePush()">
+            {{ pushBusy ? 'Enabling...' : '🔔 Enable Push Notifications' }}
+          </button>
+        </ng-container>
+
+      </ng-container>
+    </div>
+
+    <!-- MARK ALL AS READ -->
     <button
       class="btn-mark-all"
       *ngIf="notifications.length > 0"
@@ -11,42 +65,91 @@
       (click)="markAllAsRead()">
       Mark all as read
     </button>
+
   </header>
 
   <main class="notifications-container">
 
-    <div class="empty-state" *ngIf="!loading && notifications.length === 0">
+    <!-- EMPTY STATE -->
+    <div
+      class="empty-state"
+      *ngIf="!loading && notifications.length === 0">
+
       <div class="empty-icon">🔔</div>
+
       <h3>No notifications yet.</h3>
-      <p>You're all caught up. New notifications will show up here.</p>
+
+      <p>
+        You're all caught up.
+        New notifications will show up here.
+      </p>
+
     </div>
 
-    <div class="notifications-list" *ngIf="notifications.length > 0">
+    <!-- NOTIFICATION LIST -->
+    <div
+      class="notifications-list"
+      *ngIf="notifications.length > 0">
+
       <div
         class="notification-card"
         *ngFor="let n of notifications"
         [class.unread]="!n.read"
         (click)="openNotification(n)">
 
+        <!-- LEFT -->
         <div class="card-left">
-          <div class="avatar-circle">{{ n.senderName ? n.senderName[0] : '🔔' }}</div>
-        </div>
 
-        <div class="card-center">
-          <div class="notification-top">
-            <h3 *ngIf="n.senderName">{{ n.senderName }}</h3>
-            <span class="type-badge">{{ typeLabel(n.type) }}</span>
+          <div class="avatar-circle">
+            {{ n.senderName ? n.senderName[0] : '🔔' }}
           </div>
-          <p class="message">{{ n.message }}</p>
-          <span class="time">{{ n.createdAt | date:'medium' }}</span>
+
         </div>
 
+        <!-- CENTER -->
+        <div class="card-center">
+
+          <div class="notification-top">
+
+            <h3 *ngIf="n.senderName">
+              {{ n.senderName }}
+            </h3>
+
+            <span class="type-badge">
+              {{ typeLabel(n.type) }}
+            </span>
+
+          </div>
+
+          <p class="message">
+            {{ n.message }}
+          </p>
+
+          <span class="time">
+            {{ n.createdAt | date:'medium' }}
+          </span>
+
+        </div>
+
+        <!-- RIGHT -->
         <div class="card-right">
-          <span class="dot" *ngIf="!n.read" title="Unread"></span>
-          <span class="read-label" *ngIf="n.read">Read</span>
+
+          <span
+            class="dot"
+            *ngIf="!n.read"
+            title="Unread">
+          </span>
+
+          <span
+            class="read-label"
+            *ngIf="n.read">
+            Read
+          </span>
+
         </div>
 
       </div>
+
     </div>
 
   </main>

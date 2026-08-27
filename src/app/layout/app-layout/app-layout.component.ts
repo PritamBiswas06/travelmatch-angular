@@ -1,7 +1,13 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import {
+  Router,
+  RouterOutlet,
+  RouterLink,
+  RouterLinkActive
+} from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
+import { SwPush } from '@angular/service-worker';
 
 import { ChatbotComponent } from '../../travel/chatbot/chatbot.component';
 import { NotificationService } from '../../notifications/notification.service';
@@ -28,7 +34,8 @@ export class AppLayoutComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private swPush: SwPush
   ) {}
 
   get myUserId(): number | null {
@@ -37,8 +44,28 @@ export class AppLayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    // Connect the unread notification badge
+    // to the existing NotificationService.
     this.unreadCount$ = this.notificationService.unreadCount$;
+
+    // Load the current unread count.
     this.notificationService.refreshUnreadCount();
+
+    // Listen for push messages received by the Angular Service Worker.
+    //
+    // When a push arrives, refresh the in-app unread count so the
+    // notification badge stays synchronized.
+    if (this.swPush.isEnabled) {
+      this.swPush.messages.subscribe({
+        next: () => {
+          this.notificationService.refreshUnreadCount();
+        },
+        error: (err) => {
+          console.error('Service Worker push message error:', err);
+        }
+      });
+    }
   }
 
   toggleSidebar(): void {
@@ -50,11 +77,17 @@ export class AppLayoutComponent implements OnInit {
   }
 
   logout(): void {
-    const confirmLogout = confirm('Are you sure you want to logout?');
 
-    if (!confirmLogout) return;
+    const confirmLogout = confirm(
+      'Are you sure you want to logout?'
+    );
+
+    if (!confirmLogout) {
+      return;
+    }
 
     localStorage.clear();
+
     this.router.navigate(['/']);
   }
 

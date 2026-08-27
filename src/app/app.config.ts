@@ -1,7 +1,7 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, isDevMode, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideServiceWorker } from '@angular/service-worker';
 
 import { routes } from './app.routes';
 import { jwtInterceptor } from './core/jwt-interceptor.service';
@@ -9,10 +9,16 @@ import { jwtInterceptor } from './core/jwt-interceptor.service';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
+
     provideRouter(routes),
-    // provideClientHydration(withEventReplay()),
+
     provideHttpClient(
       withInterceptors([jwtInterceptor])
-    )
-  ],
+    ),
+
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    })
+  ]
 };
