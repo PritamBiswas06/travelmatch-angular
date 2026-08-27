@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 
@@ -28,6 +28,17 @@ export interface FeedPost {
   matchRequestStatus: 'NONE' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
 }
 
+export interface FeedFilters {
+  destination?: string;
+  fromLocation?: string;
+  minBudget?: number | null;
+  maxBudget?: number | null;
+  startDate?: string | null; // yyyy-MM-dd
+  endDate?: string | null;
+  travelType?: string;
+  minMatchScore?: number | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -37,10 +48,21 @@ export class FeedService {
 
   constructor(private http: HttpClient) {}
 
-  getFeed(sort: 'latest' | 'popular' | 'match' = 'latest'): Observable<FeedPost[]> {
-    return this.http.get<FeedPost[]>(`${this.baseUrl}/feed`, {
-      params: { sort }
-    });
+  getFeed(sort: 'latest' | 'popular' | 'match' = 'latest', filters?: FeedFilters): Observable<FeedPost[]> {
+    let params = new HttpParams().set('sort', sort);
+
+    if (filters) {
+      if (filters.destination) params = params.set('destination', filters.destination);
+      if (filters.fromLocation) params = params.set('fromLocation', filters.fromLocation);
+      if (filters.minBudget != null) params = params.set('minBudget', filters.minBudget);
+      if (filters.maxBudget != null) params = params.set('maxBudget', filters.maxBudget);
+      if (filters.startDate) params = params.set('startDate', filters.startDate);
+      if (filters.endDate) params = params.set('endDate', filters.endDate);
+      if (filters.travelType) params = params.set('travelType', filters.travelType);
+      if (filters.minMatchScore != null) params = params.set('minMatchScore', filters.minMatchScore);
+    }
+
+    return this.http.get<FeedPost[]>(`${this.baseUrl}/feed`, { params });
   }
 
   like(planId: number): Observable<FeedPost> {

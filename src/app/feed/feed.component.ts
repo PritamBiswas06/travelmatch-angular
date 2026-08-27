@@ -2,11 +2,29 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FeedService, FeedPost } from './feed.service';
+import { FeedService, FeedPost, FeedFilters } from './feed.service';
 import { MatchService } from '../match/match.service';
 import { LoaderService } from '../core/loader.service';
 
 type SortOption = 'latest' | 'popular' | 'match';
+
+interface FilterChip {
+  key: keyof FeedFilters;
+  label: string;
+}
+
+function emptyFilters(): FeedFilters {
+  return {
+    destination: '',
+    fromLocation: '',
+    minBudget: null,
+    maxBudget: null,
+    startDate: null,
+    endDate: null,
+    travelType: '',
+    minMatchScore: null
+  };
+}
 
 @Component({
   selector: 'app-feed',
@@ -25,6 +43,13 @@ export class FeedComponent implements OnInit {
 
   searchTerm = '';
   sortBy: SortOption = 'latest';
+
+  // Travel types currently used when creating a plan (Adventure / Religious / Leisure).
+  readonly travelTypeOptions = ['Adventure', 'Religious', 'Leisure'];
+
+  showFilterPanel = false;
+  filters: FeedFilters = emptyFilters();       // draft, edited in the panel
+  appliedFilters: FeedFilters = emptyFilters(); // what's actually sent to the backend
 
   selectedPost: FeedPost | null = null; // powers the "View Trip" modal
 
@@ -49,7 +74,7 @@ export class FeedComponent implements OnInit {
     this.loading = true;
     this.error = false;
 
-    this.feedService.getFeed(this.sortBy).subscribe({
+    this.feedService.getFeed(this.sortBy, this.appliedFilters).subscribe({
       next: (res) => {
         this.posts = res || [];
         this.applyFilter();
@@ -89,6 +114,50 @@ export class FeedComponent implements OnInit {
 
   goToCreatePlan(): void {
     this.router.navigate(['/create-plan']);
+  }
+
+  // ==================== ADVANCED FILTERS ====================
+
+  toggleFilterPanel(): void {
+    this.showFilterPanel = !this.showFilterPanel;
+  }
+
+  applyFilters(): void {
+    this.appliedFilters = { ...this.filters };
+    this.showFilterPanel = false;
+    this.loadFeed();
+  }
+
+  clearFilters(): void {
+    this.filters = emptyFilters();
+    this.appliedFilters = emptyFilters();
+    this.loadFeed();
+  }
+
+  removeFilter(key: keyof FeedFilters): void {
+    const cleared = emptyFilters();
+    this.filters = { ...this.filters, [key]: cleared[key] };
+    this.applyFilters();
+  }
+
+  get activeFilterChips(): FilterChip[] {
+    const f = this.appliedFilters;
+    const chips: FilterChip[] = [];
+
+    if (f.destination) chips.push({ key: 'destination', label: f.destination });
+    if (f.fromLocation) chips.push({ key: 'fromLocation', label: `From ${f.fromLocation}` });
+    if (f.minBudget != null) chips.push({ key: 'minBudget', label: `₹${f.minBudget}+` });
+    if (f.maxBudget != null) chips.push({ key: 'maxBudget', label: `Up to ₹${f.maxBudget}` });
+    if (f.startDate) chips.push({ key: 'startDate', label: `From ${f.startDate}` });
+    if (f.endDate) chips.push({ key: 'endDate', label: `Until ${f.endDate}` });
+    if (f.travelType) chips.push({ key: 'travelType', label: f.travelType });
+    if (f.minMatchScore != null) chips.push({ key: 'minMatchScore', label: `${f.minMatchScore}%+ match` });
+
+    return chips;
+  }
+
+  get hasActiveFilters(): boolean {
+    return this.activeFilterChips.length > 0;
   }
 
   // ==================== REACTIONS ====================

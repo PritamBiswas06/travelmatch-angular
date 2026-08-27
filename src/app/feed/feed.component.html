@@ -20,11 +20,83 @@
       />
     </div>
 
+    <button class="filter-toggle-btn" [class.active]="hasActiveFilters" (click)="toggleFilterPanel()">
+      🔎 Filters <span class="filter-count" *ngIf="hasActiveFilters">{{ activeFilterChips.length }}</span>
+    </button>
+
     <select (change)="onSortChange($event)">
       <option value="latest">🔥 Latest</option>
       <option value="popular">❤️ Popular</option>
       <option value="match">🎯 Best Match</option>
     </select>
+  </div>
+
+  <!-- ACTIVE FILTERS -->
+  <div class="active-filters-row">
+    <span class="active-filters-label" *ngIf="!hasActiveFilters">No filters applied</span>
+
+    <ng-container *ngIf="hasActiveFilters">
+      <span class="active-filters-label">Filters:</span>
+      <span class="filter-chip" *ngFor="let chip of activeFilterChips">
+        {{ chip.label }}
+        <button type="button" (click)="removeFilter(chip.key)">✕</button>
+      </span>
+      <button type="button" class="clear-filters-link" (click)="clearFilters()">Clear Filters</button>
+    </ng-container>
+  </div>
+
+  <!-- FILTER PANEL -->
+  <div class="filter-panel" *ngIf="showFilterPanel">
+
+    <div class="filter-grid">
+      <label>
+        Destination
+        <input type="text" [(ngModel)]="filters.destination" placeholder="e.g. Goa" />
+      </label>
+
+      <label>
+        From Location
+        <input type="text" [(ngModel)]="filters.fromLocation" placeholder="e.g. Bengaluru" />
+      </label>
+
+      <label>
+        Min Budget (₹)
+        <input type="number" [(ngModel)]="filters.minBudget" placeholder="e.g. 10000" min="0" />
+      </label>
+
+      <label>
+        Max Budget (₹)
+        <input type="number" [(ngModel)]="filters.maxBudget" placeholder="e.g. 30000" min="0" />
+      </label>
+
+      <label>
+        Start Date
+        <input type="date" [(ngModel)]="filters.startDate" />
+      </label>
+
+      <label>
+        End Date
+        <input type="date" [(ngModel)]="filters.endDate" />
+      </label>
+
+      <label>
+        Travel Type
+        <select [(ngModel)]="filters.travelType">
+          <option value="">All Types</option>
+          <option *ngFor="let type of travelTypeOptions" [value]="type">{{ type }}</option>
+        </select>
+      </label>
+
+      <label>
+        Minimum Match %
+        <input type="number" [(ngModel)]="filters.minMatchScore" placeholder="e.g. 50" min="0" max="100" />
+      </label>
+    </div>
+
+    <div class="filter-actions">
+      <button type="button" class="secondary-btn" (click)="clearFilters()">Clear Filters</button>
+      <button type="button" class="primary-btn" (click)="applyFilters()">Apply Filters</button>
+    </div>
   </div>
 
   <!-- LOADING STATE -->
@@ -45,19 +117,20 @@
     <button class="primary-btn" (click)="loadFeed()">Try Again</button>
   </div>
 
-  <!-- EMPTY STATE -->
-  <div class="state-message" *ngIf="!loading && !error && posts.length === 0">
+  <!-- EMPTY STATE (feed truly has nothing, no filters/search active) -->
+  <div class="state-message" *ngIf="!loading && !error && posts.length === 0 && !hasActiveFilters && !searchTerm">
     <div class="state-icon">✈️</div>
     <h2>No trips to discover yet</h2>
     <p>Create a travel plan and become the first traveler in the feed.</p>
     <button class="primary-btn" (click)="goToCreatePlan()">+ Create Travel Plan</button>
   </div>
 
-  <!-- NO SEARCH RESULTS -->
-  <div class="state-message" *ngIf="!loading && !error && posts.length > 0 && filteredPosts.length === 0">
+  <!-- NO RESULTS FOR CURRENT FILTERS/SEARCH -->
+  <div class="state-message" *ngIf="!loading && !error && (posts.length === 0 ? (hasActiveFilters || searchTerm) : filteredPosts.length === 0)">
     <div class="state-icon">🧭</div>
-    <h2>No trips match your search</h2>
-    <p>Try a different destination or clear your search.</p>
+    <h2>No trips match your filters.</h2>
+    <p>Try adjusting your filters or search, or clear them to see everything.</p>
+    <button class="primary-btn" *ngIf="hasActiveFilters" (click)="clearFilters()">Clear Filters</button>
   </div>
 
   <!-- POSTS -->
