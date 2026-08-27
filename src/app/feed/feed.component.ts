@@ -310,6 +310,10 @@ export class FeedComponent implements OnInit {
     return (name || '?').trim().charAt(0).toUpperCase();
   }
 
+  ratingClass(rating: string): string {
+    return 'rating-' + rating.toLowerCase().replace(/\s+/g, '-');
+  }
+
   trackByPostId(_index: number, post: FeedPost): number {
     return post.id;
   }

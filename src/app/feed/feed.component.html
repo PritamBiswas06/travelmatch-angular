@@ -154,7 +154,15 @@
       </div>
 
       <div class="match-score" *ngIf="post.matchScore !== null">
-        🔥 {{ post.matchScore }}% Travel Match
+        🔥 {{ post.matchScore }}% Travel Compatibility
+        <button
+          type="button"
+          class="why-match-link"
+          *ngIf="post.matchFactors.length > 0"
+          (click)="openTrip(post)"
+        >
+          Why this match?
+        </button>
       </div>
 
       <!-- ROUTE -->
@@ -279,6 +287,14 @@
         <div class="detail-row" *ngIf="selectedPost.matchScore !== null">
           <span class="label">Match Score</span>
           <span class="value">🔥 {{ selectedPost.matchScore }}%</span>
+        </div>
+      </div>
+
+      <div class="compatibility-breakdown" *ngIf="selectedPost.matchFactors.length > 0">
+        <h4>Why this match?</h4>
+        <div class="compatibility-row" *ngFor="let factor of selectedPost.matchFactors">
+          <span class="compatibility-label">{{ factor.label }}</span>
+          <span class="compatibility-rating" [ngClass]="ratingClass(factor.rating)">{{ factor.rating }}</span>
         </div>
       </div>
 

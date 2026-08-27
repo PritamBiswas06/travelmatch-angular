@@ -3,6 +3,11 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 
+export interface CompatibilityFactor {
+  label: string;
+  rating: 'Excellent' | 'Very Good' | 'Good' | 'Fair' | 'Poor';
+}
+
 export interface FeedPost {
   id: number;
   userId: number;
@@ -19,6 +24,7 @@ export interface FeedPost {
   createdAt: string;
 
   matchScore: number | null;
+  matchFactors: CompatibilityFactor[];
 
   likeCount: number;
   dislikeCount: number;
