@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { FeedService, FeedPost, FeedFilters } from './feed.service';
 import { MatchService } from '../match/match.service';
 import { LoaderService } from '../core/loader.service';
+import { LocationImageService } from './location-image.service';
 
 type SortOption = 'latest' | 'popular' | 'match';
 
@@ -44,26 +45,25 @@ export class FeedComponent implements OnInit {
   searchTerm = '';
   sortBy: SortOption = 'latest';
 
-  // Travel types currently used when creating a plan (Adventure / Religious / Leisure).
   readonly travelTypeOptions = ['Adventure', 'Religious', 'Leisure'];
 
   showFilterPanel = false;
-  filters: FeedFilters = emptyFilters();       // draft, edited in the panel
-  appliedFilters: FeedFilters = emptyFilters(); // what's actually sent to the backend
+  filters: FeedFilters = emptyFilters();
+  appliedFilters: FeedFilters = emptyFilters();
 
-  selectedPost: FeedPost | null = null; // powers the "View Trip" modal
+  selectedPost: FeedPost | null = null;
 
   toastMessage: string | null = null;
   private toastTimeout: any;
 
-  // ids currently mid-flight for a reaction/request, so buttons can show a busy state
   pendingActionIds = new Set<string>();
 
   constructor(
     private feedService: FeedService,
     private matchService: MatchService,
     private loader: LoaderService,
-    private router: Router
+    private router: Router,
+    public locationImageService: LocationImageService
   ) {}
 
   ngOnInit(): void {
@@ -116,8 +116,6 @@ export class FeedComponent implements OnInit {
     this.router.navigate(['/create-plan']);
   }
 
-  // ==================== ADVANCED FILTERS ====================
-
   toggleFilterPanel(): void {
     this.showFilterPanel = !this.showFilterPanel;
   }
@@ -144,14 +142,61 @@ export class FeedComponent implements OnInit {
     const f = this.appliedFilters;
     const chips: FilterChip[] = [];
 
-    if (f.destination) chips.push({ key: 'destination', label: f.destination });
-    if (f.fromLocation) chips.push({ key: 'fromLocation', label: `From ${f.fromLocation}` });
-    if (f.minBudget != null) chips.push({ key: 'minBudget', label: `₹${f.minBudget}+` });
-    if (f.maxBudget != null) chips.push({ key: 'maxBudget', label: `Up to ₹${f.maxBudget}` });
-    if (f.startDate) chips.push({ key: 'startDate', label: `From ${f.startDate}` });
-    if (f.endDate) chips.push({ key: 'endDate', label: `Until ${f.endDate}` });
-    if (f.travelType) chips.push({ key: 'travelType', label: f.travelType });
-    if (f.minMatchScore != null) chips.push({ key: 'minMatchScore', label: `${f.minMatchScore}%+ match` });
+    if (f.destination) {
+      chips.push({
+        key: 'destination',
+        label: f.destination
+      });
+    }
+
+    if (f.fromLocation) {
+      chips.push({
+        key: 'fromLocation',
+        label: `From ${f.fromLocation}`
+      });
+    }
+
+    if (f.minBudget != null) {
+      chips.push({
+        key: 'minBudget',
+        label: `₹${f.minBudget}+`
+      });
+    }
+
+    if (f.maxBudget != null) {
+      chips.push({
+        key: 'maxBudget',
+        label: `Up to ₹${f.maxBudget}`
+      });
+    }
+
+    if (f.startDate) {
+      chips.push({
+        key: 'startDate',
+        label: `From ${f.startDate}`
+      });
+    }
+
+    if (f.endDate) {
+      chips.push({
+        key: 'endDate',
+        label: `Until ${f.endDate}`
+      });
+    }
+
+    if (f.travelType) {
+      chips.push({
+        key: 'travelType',
+        label: f.travelType
+      });
+    }
+
+    if (f.minMatchScore != null) {
+      chips.push({
+        key: 'minMatchScore',
+        label: `${f.minMatchScore}%+ match`
+      });
+    }
 
     return chips;
   }
@@ -160,19 +205,21 @@ export class FeedComponent implements OnInit {
     return this.activeFilterChips.length > 0;
   }
 
-  // ==================== REACTIONS ====================
-
   private actionKey(planId: number, action: string): string {
     return `${planId}:${action}`;
   }
 
   isPending(planId: number, action: string): boolean {
-    return this.pendingActionIds.has(this.actionKey(planId, action));
+    return this.pendingActionIds.has(
+      this.actionKey(planId, action)
+    );
   }
 
   toggleLike(post: FeedPost): void {
     const key = this.actionKey(post.id, 'like');
+
     if (this.pendingActionIds.has(key)) return;
+
     this.pendingActionIds.add(key);
 
     this.feedService.like(post.id).subscribe({
@@ -189,7 +236,9 @@ export class FeedComponent implements OnInit {
 
   toggleDislike(post: FeedPost): void {
     const key = this.actionKey(post.id, 'dislike');
+
     if (this.pendingActionIds.has(key)) return;
+
     this.pendingActionIds.add(key);
 
     this.feedService.dislike(post.id).subscribe({
@@ -206,9 +255,15 @@ export class FeedComponent implements OnInit {
 
   private mergePost(updated: FeedPost): void {
     const apply = (arr: FeedPost[]) => {
-      const idx = arr.findIndex(p => p.id === updated.id);
-      if (idx > -1) arr[idx] = updated;
+      const idx = arr.findIndex(
+        p => p.id === updated.id
+      );
+
+      if (idx > -1) {
+        arr[idx] = updated;
+      }
     };
+
     apply(this.posts);
     apply(this.filteredPosts);
 
@@ -217,10 +272,9 @@ export class FeedComponent implements OnInit {
     }
   }
 
-  // ==================== SHARE ====================
-
   share(post: FeedPost): void {
-    const url = `${window.location.origin}/feed?trip=${post.id}`;
+    const url =
+      `${window.location.origin}/feed?trip=${post.id}`;
 
     this.feedService.share(post.id).subscribe({
       next: (updated) => this.mergePost(updated),
@@ -229,12 +283,13 @@ export class FeedComponent implements OnInit {
 
     if (navigator.share) {
       navigator.share({
-        title: `${post.fromLocation} → ${post.destination} on TravelMatch`,
-        text: `Check out this trip to ${post.destination}!`,
+        title:
+          `${post.fromLocation} → ${post.destination} on TravelMatch`,
+        text:
+          `Check out this trip to ${post.destination}!`,
         url
-      }).catch(() => {
-        // user cancelled the native share sheet — no-op
-      });
+      }).catch(() => {});
+
       return;
     }
 
@@ -246,11 +301,14 @@ export class FeedComponent implements OnInit {
 
   private showToast(message: string): void {
     this.toastMessage = message;
-    clearTimeout(this.toastTimeout);
-    this.toastTimeout = setTimeout(() => (this.toastMessage = null), 2500);
-  }
 
-  // ==================== VIEW TRIP MODAL ====================
+    clearTimeout(this.toastTimeout);
+
+    this.toastTimeout = setTimeout(
+      () => (this.toastMessage = null),
+      2500
+    );
+  }
 
   openTrip(post: FeedPost): void {
     this.selectedPost = post;
@@ -260,33 +318,51 @@ export class FeedComponent implements OnInit {
     this.selectedPost = null;
   }
 
-  // ==================== VIEW PROFILE ====================
-
   viewProfile(post: FeedPost): void {
-    this.router.navigate(['/profile', post.userId]);
+    this.router.navigate([
+      '/profile',
+      post.userId
+    ]);
   }
-
-  // ==================== MATCH REQUEST ====================
 
   sendMatchRequest(post: FeedPost): void {
     const key = this.actionKey(post.id, 'match');
+
     if (this.pendingActionIds.has(key)) return;
-    if (post.matchRequestStatus === 'PENDING' || post.matchRequestStatus === 'ACCEPTED') return;
+
+    if (
+      post.matchRequestStatus === 'PENDING' ||
+      post.matchRequestStatus === 'ACCEPTED'
+    ) {
+      return;
+    }
 
     this.pendingActionIds.add(key);
-    this.loader.show('Sending travel match request...');
+
+    this.loader.show(
+      'Sending travel match request...'
+    );
 
     this.matchService.sendMatchRequest(post.id).subscribe({
       next: () => {
         this.loader.hide();
         this.pendingActionIds.delete(key);
-        this.mergePost({ ...post, matchRequestStatus: 'PENDING' });
+
+        this.mergePost({
+          ...post,
+          matchRequestStatus: 'PENDING'
+        });
       },
       error: (err) => {
         this.loader.hide();
         this.pendingActionIds.delete(key);
+
         console.error(err);
-        this.showToast(err?.error?.message || 'Could not send request');
+
+        this.showToast(
+          err?.error?.message ||
+          'Could not send request'
+        );
       }
     });
   }
@@ -295,26 +371,34 @@ export class FeedComponent implements OnInit {
     switch (post.matchRequestStatus) {
       case 'PENDING':
         return 'Request Sent';
+
       case 'ACCEPTED':
         return 'Matched ✓';
+
       case 'REJECTED':
         return 'Send Again';
+
       default:
         return 'Send Travel Match Request';
     }
   }
 
-  // ==================== HELPERS ====================
-
   initials(name: string): string {
-    return (name || '?').trim().charAt(0).toUpperCase();
+    return (name || '?')
+      .trim()
+      .charAt(0)
+      .toUpperCase();
   }
 
   ratingClass(rating: string): string {
-    return 'rating-' + rating.toLowerCase().replace(/\s+/g, '-');
+    return 'rating-' +
+      rating.toLowerCase().replace(/\s+/g, '-');
   }
 
-  trackByPostId(_index: number, post: FeedPost): number {
+  trackByPostId(
+    _index: number,
+    post: FeedPost
+  ): number {
     return post.id;
   }
 }

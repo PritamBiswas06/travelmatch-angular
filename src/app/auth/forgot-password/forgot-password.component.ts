@@ -3,6 +3,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { LoaderService } from '../../core/loader.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -20,7 +21,8 @@ export class ForgotPasswordComponent implements OnInit {
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -55,7 +57,7 @@ export class ForgotPasswordComponent implements OnInit {
 
         this.loader.hide();
 
-        alert(err.error?.message || "Failed");
+        this.toast.error(err.error?.message || "Failed");
 
       }
 

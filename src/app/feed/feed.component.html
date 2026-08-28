@@ -136,7 +136,26 @@
   <!-- POSTS -->
   <div class="posts-column" *ngIf="!loading && !error && filteredPosts.length > 0">
 
-    <article class="post-card" *ngFor="let post of filteredPosts; trackBy: trackByPostId">
+    <article
+      class="post-card post-card-with-background"
+      *ngFor="let post of filteredPosts; trackBy: trackByPostId"
+    >
+
+      <!-- LOCATION BACKGROUND -->
+      <div
+        class="post-background"
+        aria-hidden="true"
+        [style.background-image]="'url(' + locationImageService.getImageUrl(post.destination) + ')'"
+      ></div>
+
+      <!-- DARK / GRADIENT OVERLAY -->
+      <div
+        class="post-background-overlay"
+        aria-hidden="true"
+      ></div>
+
+      <!-- CARD CONTENT -->
+      <div class="post-content">
 
       <!-- CARD HEADER -->
       <div class="post-header">
@@ -228,6 +247,8 @@
         >
           {{ matchButtonLabel(post) }}
         </button>
+      </div>
+
       </div>
 
     </article>

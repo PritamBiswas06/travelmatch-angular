@@ -3,6 +3,7 @@ import { MatchService } from '../match.service';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { LoaderService } from '../../core/loader.service';
+import { ToastService } from '../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-requests',
@@ -17,7 +18,8 @@ export class RequestsComponent implements OnInit {
 
   constructor(private matchService: MatchService,
     private router: Router,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -42,7 +44,7 @@ export class RequestsComponent implements OnInit {
   //       this.loadRequests();
   //     },
   //     error: () => {
-  //       alert('Failed to accept request');
+  //       this.toast.error('Failed to accept request');
   //     }
   //   });
   // }
@@ -69,7 +71,7 @@ accept(id: number) {
     },
     error: () => {
       this.loader.hide();
-      alert('Failed to accept request');
+      this.toast.error('Failed to accept request');
     }
   });
 }
@@ -79,12 +81,12 @@ accept(id: number) {
     this.matchService.rejectRequest(id).subscribe({
       next: () => {
         this.loader.hide();
-        alert('Request Rejected!');
+        this.toast.success('Request Rejected!');
         this.loadRequests();
       },
       error: () => {
         this.loader.hide();
-        alert('Failed to reject request');
+        this.toast.error('Failed to reject request');
       }
     });
   }

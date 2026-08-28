@@ -3,6 +3,7 @@ import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angula
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { LoaderService } from '../../core/loader.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -22,7 +23,8 @@ export class ResetPasswordComponent implements OnInit {
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -56,7 +58,7 @@ export class ResetPasswordComponent implements OnInit {
 
         this.loader.hide();
 
-        alert("Password updated");
+        this.toast.success("Password updated");
 
         localStorage.removeItem("resetEmail");
 
@@ -68,7 +70,7 @@ export class ResetPasswordComponent implements OnInit {
 
         this.loader.hide();
 
-        alert(err.error?.message || "Failed");
+        this.toast.error(err.error?.message || "Failed");
 
       }
 

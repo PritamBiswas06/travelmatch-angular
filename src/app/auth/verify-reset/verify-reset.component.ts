@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { LoaderService } from '../../core/loader.service';
+import { ToastService } from '../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-verify-reset',
@@ -26,7 +27,8 @@ export class VerifyResetComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private router: Router,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(){
@@ -82,14 +84,14 @@ export class VerifyResetComponent implements OnInit {
 
     this.startTimer();
 
-    alert("OTP resent");
+    this.toast.success("OTP resent");
 
   }
 
   verify(){
 
     if(this.otpValue.length !== 6){
-      alert("Enter the 6 digit code");
+      this.toast.warning("Enter the 6 digit code");
       return;
     }
 
@@ -109,7 +111,7 @@ export class VerifyResetComponent implements OnInit {
 
         this.loader.hide();
 
-        alert(err.error?.message || "Invalid code");
+        this.toast.error(err.error?.message || "Invalid code");
 
       }
 

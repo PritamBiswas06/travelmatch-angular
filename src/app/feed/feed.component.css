@@ -241,18 +241,97 @@
 /* POST CARD */
 
 .post-card {
-  background: rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  background: rgba(15, 23, 42, 0.92);
   backdrop-filter: blur(12px);
+
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 22px;
-  transition: 0.3s;
+
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+
   animation: fadeUp 0.5s ease;
 }
+
+.post-card-with-background {
+  min-height: 430px;
+}
+
+/* DESTINATION BACKGROUND IMAGE */
+
+.post-background {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+
+  background-color: #172033;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  transform: scale(1.03);
+
+  filter:
+    saturate(0.9)
+    contrast(1.05);
+
+  transition:
+    transform 0.6s ease,
+    filter 0.6s ease;
+}
+
+/* DARK / GRADIENT OVERLAY
+   Keeps white text readable over travel photography. */
+
+.post-background-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7, 12, 24, 0.86) 0%,
+      rgba(8, 15, 30, 0.68) 40%,
+      rgba(8, 15, 30, 0.94) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(15, 23, 42, 0.38),
+      rgba(15, 23, 42, 0.10)
+    );
+
+  pointer-events: none;
+}
+
+/* CONTENT ABOVE IMAGE */
+
+.post-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* SUBTLE TRAVEL-PHOTO HOVER */
 
 .post-card:hover {
   border-color: rgba(99, 102, 241, 0.35);
   box-shadow: 0 20px 45px rgba(99, 102, 241, 0.15);
+  transform: translateY(-2px);
+}
+
+.post-card:hover .post-background {
+  transform: scale(1.07);
+
+  filter:
+    saturate(1.05)
+    contrast(1.08);
 }
 
 @keyframes fadeUp {
@@ -310,11 +389,12 @@
 }
 
 .status-badge {
-  background: #10b981;
+  background: rgba(16, 185, 129, 0.92);
   padding: 5px 10px;
   border-radius: 20px;
   font-size: 12px;
   white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
 }
 
 .match-score {
@@ -441,7 +521,8 @@
 }
 
 .type-tag {
-  background: #334155;
+  background: rgba(30, 41, 59, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 3px 10px;
   border-radius: 20px;
 }
@@ -760,6 +841,14 @@
     max-width: 100%;
   }
 
+  .post-card-with-background {
+    min-height: 0;
+  }
+
+  .post-background {
+    background-position: center center;
+  }
+
   .actions-row {
     flex-direction: column;
   }
@@ -791,6 +880,11 @@
 
   .post-card {
     padding: 16px;
+    border-radius: 18px;
+  }
+
+  .post-background {
+    background-position: center;
   }
 
   .feed-header h1 {

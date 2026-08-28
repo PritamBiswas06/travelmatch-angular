@@ -4,6 +4,7 @@ import { TravelService } from '../travel.service';
 import { MatchService } from '../../match/match.service';
 import { CommonModule } from '@angular/common';
 import { LoaderService } from '../../core/loader.service';
+import { ToastService } from '../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-matches',
@@ -21,7 +22,8 @@ export class MatchesComponent implements OnInit {
     private route: ActivatedRoute,
     private travelService: TravelService,
     private matchService: MatchService,
-    private loader:LoaderService
+    private loader:LoaderService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -45,11 +47,11 @@ export class MatchesComponent implements OnInit {
     this.matchService.sendMatchRequest(travelPlanId).subscribe({
       next: () => {
         this.loader.hide();
-        alert('Match request sent successfully!');
+        this.toast.success('Match request sent successfully!');
       },
       error: (err) => {
         this.loader.hide();
-        alert('Request failed or already sent.');
+        this.toast.error('Request failed or already sent.');
         console.error(err);
       }
     });

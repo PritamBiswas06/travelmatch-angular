@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../chat.service';
 import { NotificationService } from '../../notifications/notification.service';
+import { ToastService } from '../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-chat-room',
@@ -23,7 +24,8 @@ export class ChatRoomComponent implements OnInit, AfterViewChecked {
   constructor(
     private route: ActivatedRoute,
     private chatService: ChatService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -31,7 +33,7 @@ export class ChatRoomComponent implements OnInit, AfterViewChecked {
     this.userId = Number(this.route.snapshot.paramMap.get('id'));
     
     if (!this.userId || this.userId <= 0) {
-      alert("Invalid user ID");
+      this.toast.error("Invalid user ID");
       return;
     }
 
@@ -72,7 +74,7 @@ export class ChatRoomComponent implements OnInit, AfterViewChecked {
         this.newMessage = '';
         this.loadMessages();
       },
-      error: (err) => alert("Failed to send message")
+      error: (err) => this.toast.error("Failed to send message")
     });
   }
 

@@ -1,94 +1,141 @@
 <div class="dashboard-wrapper">
 
-  <!-- HEADER -->
   <header class="dashboard-header">
-    <div>
-      <h1>
-        Welcome back, <span class="highlight">{{userName}}</span> 👋
-      </h1>
-      <p>{{plans.length}} travel plans waiting for you</p>
-
-      <!-- QUICK STATS -->
-      <div class="quick-stats">
-        <span>🧳 Trips: {{plans.length}}</span>
-        <span>🤝 Matches: {{plans.length * 3}}</span>
-        <span>💬 Chats: {{plans.length * 2}}</span>
-      </div>
+    <div class="welcome-copy">
+      <div class="eyebrow">YOUR TRAVEL SPACE</div>
+      <h1>Welcome back, <span class="highlight">{{ userName }}</span> 👋</h1>
+      <p>Plan your next adventure, meet travelers and keep your journeys moving.</p>
     </div>
 
     <div class="header-actions">
-      <select (change)="onSortChange($event)">
+      <select (change)="onSortChange($event)" [value]="sortType" aria-label="Sort trips">
         <option value="latest">🔥 Latest</option>
         <option value="budget">💰 Budget</option>
         <option value="date">📅 Date</option>
       </select>
-
-      <button class="create-btn" (click)="goToCreatePlan()">
-        + New Trip
-      </button>
+      <button class="create-btn" (click)="goToCreatePlan()">＋ New Trip</button>
     </div>
   </header>
 
-  <!-- EMPTY STATE -->
-  <div class="empty-state" *ngIf="plans.length === 0">
-    <div class="empty-icon">🌍</div>
-    <h2>No trips yet</h2>
-    <p>Start your first journey and find travel partners 🚀</p>
-    <button (click)="goToCreatePlan()">Create First Trip</button>
-  </div>
+  <section class="stat-grid">
+    <button class="stat-card stat-purple" (click)="goTo('/dashboard')">
+      <span class="stat-icon">🧳</span>
+      <span class="stat-copy"><strong>{{ plans.length }}</strong><small>My Trips</small></span>
+      <span class="stat-arrow">→</span>
+    </button>
 
-  <!-- PLANS -->
-  <div class="plans-grid" *ngIf="plans.length > 0">
+    <button class="stat-card stat-green" (click)="goTo('/partners')">
+      <span class="stat-icon">🤝</span>
+      <span class="stat-copy"><strong>{{ partners.length }}</strong><small>Travel Partners</small></span>
+      <span class="stat-arrow">→</span>
+    </button>
 
-    <div 
-      class="plan-card"
-      *ngFor="let plan of plans; let i = index"
-      [class.latest]="i === 0"
-    >
+    <button class="stat-card stat-orange" (click)="goTo('/requests')">
+      <span class="stat-icon">✉️</span>
+      <span class="stat-copy"><strong>{{ pendingRequests }}</strong><small>Requests</small></span>
+      <span class="stat-arrow">→</span>
+    </button>
 
-      <!-- TOP -->
-      <div class="card-top">
-        <span class="trip-tag">{{plan.travelType}}</span>
+    <button class="stat-card stat-blue" (click)="goTo('/notifications')">
+      <span class="stat-icon">🔔</span>
+      <span class="stat-copy"><strong>{{ unreadNotifications }}</strong><small>Unread Notifications</small></span>
+      <span class="stat-arrow">→</span>
+    </button>
+  </section>
 
-        <div class="top-right">
-          <span class="status">🟢 Active</span>
-          <span class="latest-badge" *ngIf="i === 0">🔥 Latest</span>
-        </div>
-      </div>
-
-      <!-- MATCH SCORE -->
-      <div class="match-score">
-        🔥 {{80 + i}}% Match
-      </div>
-
-      <!-- ROUTE -->
-      <div class="trip-route">
-        <div>
-          <h3>{{plan.fromLocation}}</h3>
-          <small>Departure</small>
-        </div>
-
-        <div class="plane">✈️</div>
-
-        <div>
-          <h3>{{plan.destination}}</h3>
-          <small>Destination</small>
-        </div>
-      </div>
-
-      <!-- META -->
-      <div class="meta">
-        <span>📅 {{plan.startDate | date:'mediumDate'}}</span>
-        <span>💰 ₹{{plan.budget}}</span>
-      </div>
-
-      <!-- ACTION -->
-      <button (click)="goToMatches(plan.id)">
-        Find Travel Partners
-      </button>
-
+  <section class="quick-actions panel">
+    <div class="section-heading">
+      <div><span class="section-kicker">SHORTCUTS</span><h2>Quick Actions</h2></div>
+      <span class="heading-note">Everything you need in one tap</span>
     </div>
 
+    <div class="action-grid">
+      <button class="action-card action-purple" (click)="goToCreatePlan()"><span>➕</span><div><strong>Create New Trip</strong><small>Start a new journey</small></div></button>
+      <button class="action-card action-blue" (click)="goTo('/feed')"><span>📰</span><div><strong>Browse Feed</strong><small>Discover travel plans</small></div></button>
+      <button class="action-card action-green" (click)="goTo('/partners')"><span>🔎</span><div><strong>Find Partners</strong><small>Meet compatible travelers</small></div></button>
+      <button class="action-card action-orange" (click)="goTo('/requests')"><span>📩</span><div><strong>My Requests</strong><small>{{ pendingRequests }} waiting</small></div></button>
+      <button class="action-card action-pink" (click)="goTo('/notifications')"><span>🔔</span><div><strong>Notifications</strong><small>Stay up to date</small></div></button>
+      <button class="action-card action-cyan" (click)="goTo('/partners')"><span>💬</span><div><strong>Open Chats</strong><small>Message your partners</small></div></button>
+    </div>
+  </section>
+
+  <div class="dashboard-columns">
+    <section class="panel trips-panel">
+      <div class="section-heading">
+        <div><span class="section-kicker">YOUR JOURNEYS</span><h2>Upcoming Trips</h2></div>
+        <button class="text-link" *ngIf="plans.length > 3" (click)="goTo('/dashboard')">View all →</button>
+      </div>
+
+      <div class="trip-list" *ngIf="plans.length > 0; else noTrips">
+        <article class="mini-trip" *ngFor="let plan of plans | slice:0:4; trackBy: trackByPlanId">
+          <div class="trip-icon">✈️</div>
+          <div class="trip-info">
+            <strong>{{ plan.fromLocation }} <span>→</span> {{ plan.destination }}</strong>
+            <span>{{ plan.startDate | date:'mediumDate' }} · ₹{{ plan.budget }}</span>
+          </div>
+          <div class="trip-side">
+            <span class="trip-status">● Active</span>
+            <button (click)="goToMatches(plan.id)">Find Partners</button>
+          </div>
+        </article>
+      </div>
+
+      <ng-template #noTrips>
+        <div class="small-empty"><span>🌍</span><strong>No trips yet</strong><p>Create your first journey to start matching.</p><button (click)="goToCreatePlan()">Create Trip</button></div>
+      </ng-template>
+    </section>
+
+    <section class="panel matches-panel">
+      <div class="section-heading">
+        <div><span class="section-kicker">YOUR CIRCLE</span><h2>Recent Matches</h2></div>
+        <button class="text-link" (click)="goTo('/partners')">View all →</button>
+      </div>
+
+      <div class="partner-list" *ngIf="partners.length > 0; else noPartners">
+        <article class="mini-partner" *ngFor="let partner of partners | slice:0:4">
+          <div class="partner-avatar">{{ partnerName(partner).charAt(0).toUpperCase() }}</div>
+          <div class="partner-info"><strong>{{ partnerName(partner) }}</strong><span>{{ partnerLocation(partner) }}</span></div>
+          <button class="chat-btn" *ngIf="partnerId(partner)" (click)="goTo('/chat/' + partnerId(partner))">Chat</button>
+        </article>
+      </div>
+
+      <ng-template #noPartners>
+        <div class="small-empty"><span>🤝</span><strong>No travel partners yet</strong><p>Find a compatible traveler from your plans.</p><button (click)="goTo('/feed')">Explore Feed</button></div>
+      </ng-template>
+    </section>
+  </div>
+
+  <div class="dashboard-columns bottom-columns">
+    <section class="panel activity-panel">
+      <div class="section-heading">
+        <div><span class="section-kicker">STAY INFORMED</span><h2>Recent Activity</h2></div>
+        <button class="text-link" (click)="goTo('/notifications')">All notifications →</button>
+      </div>
+
+      <div class="activity-list" *ngIf="recentNotifications.length > 0; else noActivity">
+        <button class="activity-item" *ngFor="let n of recentNotifications; trackBy: trackByNotificationId" (click)="goTo('/notifications')" [class.unread]="!n.read">
+          <span class="activity-icon">{{ notificationIcon(n.type) }}</span>
+          <span class="activity-copy"><strong>{{ n.senderName || 'TravelMatch' }}</strong><small>{{ notificationText(n) }}</small></span>
+          <span class="activity-time">{{ n.createdAt | date:'shortTime' }}</span>
+        </button>
+      </div>
+
+      <ng-template #noActivity><div class="small-empty compact"><span>✨</span><strong>You're all caught up</strong><p>New activity will appear here.</p></div></ng-template>
+    </section>
+
+    <section class="panel destinations-panel" *ngIf="destinationSummary.length > 0">
+      <div class="section-heading">
+        <div><span class="section-kicker">YOUR PLANS</span><h2>Top Destinations</h2></div>
+      </div>
+      <div class="destination-list">
+        <div class="destination-item" *ngFor="let destination of destinationSummary; let i = index">
+          <span class="destination-rank">0{{ i + 1 }}</span>
+          <span class="destination-name">{{ destination.name }}</span>
+          <span class="destination-count">{{ destination.count }} {{ destination.count === 1 ? 'trip' : 'trips' }}</span>
+        </div>
+      </div>
+      <div class="travel-tip"><span>💡</span><p>Keep your plans updated to discover better travel matches.</p></div>
+    </section>
   </div>
 
 </div>

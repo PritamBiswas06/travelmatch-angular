@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { AuthService } from '../auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { LoaderService } from '../../core/loader.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -20,7 +21,8 @@ export class RegisterComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -71,7 +73,7 @@ export class RegisterComponent implements OnInit {
 
         localStorage.setItem("verifyEmail", this.registerForm.value.email);
 
-        alert("Verification code sent to your email");
+        this.toast.success("Verification code sent to your email");
 
         this.router.navigate(['/verify-email']);
 
@@ -81,7 +83,7 @@ export class RegisterComponent implements OnInit {
 
         this.loader.hide();
 
-        alert(err?.error?.message || "Registration failed");
+        this.toast.error(err?.error?.message || "Registration failed");
 
         console.error(err);
 

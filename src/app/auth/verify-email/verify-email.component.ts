@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { LoaderService } from '../../core/loader.service';
+import { ToastService } from '../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-verify-email',
@@ -25,7 +26,8 @@ export class VerifyEmailComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private toast: ToastService
   ) {}
 
   focusInput() {
@@ -100,7 +102,7 @@ resendOtp(){
 
       this.loader.hide();
 
-      alert("New OTP sent to your email");
+      this.toast.success("New OTP sent to your email");
 
       this.startTimer();
 
@@ -110,7 +112,7 @@ resendOtp(){
 
       this.loader.hide();
 
-      alert("Failed to resend OTP");
+      this.toast.error("Failed to resend OTP");
 
     }
 
@@ -132,7 +134,7 @@ resendOtp(){
 
         this.loader.hide();
 
-        alert("Email verified successfully");
+        this.toast.success("Email verified successfully");
 
         localStorage.removeItem("verifyEmail");
 
@@ -144,7 +146,7 @@ resendOtp(){
 
         this.loader.hide();
 
-        alert(err.error?.message || "Verification failed");
+        this.toast.error(err.error?.message || "Verification failed");
 
       }
 

@@ -13,6 +13,7 @@ import {
 
 import { MatchService } from '../../match/match.service';
 import { LoaderService } from '../../core/loader.service';
+import { ModalService } from '../../shared/modal/modal.service';
 
 interface EditModel {
   name: string;
@@ -149,7 +150,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private router: Router,
     private profileService: ProfileService,
     private matchService: MatchService,
-    private loader: LoaderService
+    private loader: LoaderService,
+    private modalService: ModalService
   ) {}
 
   // ==================== INIT ====================
@@ -222,7 +224,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   // ==================== DELETE TRIP ====================
 
-  deleteTrip(trip: ProfileTrip): void {
+  async deleteTrip(trip: ProfileTrip): Promise<void> {
 
     // Extra frontend protection:
     // Delete button should only work on the owner's profile.
@@ -230,8 +232,11 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const confirmed = confirm(
-      `Delete your trip to ${trip.destination}?\n\nThis action cannot be undone.`
+    const confirmed = await this.modalService.confirm(
+      `Delete your trip to ${trip.destination}?\n\nThis action cannot be undone.`,
+      'Delete this trip?',
+      'Yes, Delete',
+      'Keep Trip'
     );
 
     if (!confirmed) {
@@ -787,17 +792,20 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.resetPhotoSelection();
   }
 
-  removePhoto(): void {
+  async removePhoto(): Promise<void> {
 
     if (this.uploadingPhoto) {
       return;
     }
 
-    if (
-      !confirm(
-        'Remove your profile photo?'
-      )
-    ) {
+    const confirmed = await this.modalService.confirm(
+      'Remove your current profile photo?',
+      'Remove profile photo?',
+      'Yes, Remove',
+      'Keep Photo'
+    );
+
+    if (!confirmed) {
       return;
     }
 

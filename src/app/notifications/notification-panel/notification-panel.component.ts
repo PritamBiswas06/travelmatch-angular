@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { NotificationService } from '../notification.service';
 import { Notification } from '../notification.model';
 import { LoaderService } from '../../core/loader.service';
+import { ToastService } from '../../shared/toast/toast.service';
 import { PushNotificationService, PushPermissionState } from '../push-notification.service';
 
 
@@ -37,7 +38,8 @@ export class NotificationPanelComponent implements OnInit {
     private notificationService: NotificationService,
     private pushNotificationService: PushNotificationService,
     private loader: LoaderService,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -218,7 +220,7 @@ export class NotificationPanelComponent implements OnInit {
 
         console.error('Failed to mark all notifications as read:', err);
 
-        alert('Failed to mark all as read');
+        this.toast.error('Failed to mark all as read');
       }
     });
   }

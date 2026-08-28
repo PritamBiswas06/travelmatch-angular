@@ -1,6 +1,6 @@
 <div class="app-layout">
 
-  <aside class="sidebar" [class.collapsed]="!sidebarOpen">
+  <aside class="sidebar" [class.collapsed]="!sidebarOpen" (mouseenter)="onSidebarEnter()" (mouseleave)="onSidebarLeave()">
     <div class="sidebar-header">
       <span class="logo" *ngIf="sidebarOpen">✈ TravelMatch</span>
       <span class="logo-icon" *ngIf="!sidebarOpen">✈</span>
@@ -10,31 +10,31 @@
     </div>
 
     <nav>
-      <a routerLink="/dashboard" routerLinkActive="active">
+      <a routerLink="/dashboard" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
         <span class="icon">🏠</span>
         <span class="label" *ngIf="sidebarOpen">Dashboard</span>
       </a>
-      <a routerLink="/feed" routerLinkActive="active">
+      <a routerLink="/feed" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
         <span class="icon">📰</span>
         <span class="label" *ngIf="sidebarOpen">Feed</span>
       </a>
-      <a *ngIf="myUserId" [routerLink]="['/profile', myUserId]" routerLinkActive="active">
+      <a *ngIf="myUserId" [routerLink]="['/profile', myUserId]" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
         <span class="icon">👤</span>
         <span class="label" *ngIf="sidebarOpen">Profile</span>
       </a>
-      <a routerLink="/create-plan" routerLinkActive="active">
+      <a routerLink="/create-plan" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
         <span class="icon">➕</span>
         <span class="label" *ngIf="sidebarOpen">Create Plan</span>
       </a>
-      <a routerLink="/requests" routerLinkActive="active">
+      <a routerLink="/requests" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
         <span class="icon">📩</span>
         <span class="label" *ngIf="sidebarOpen">Requests</span>
       </a>
-      <a routerLink="/partners" routerLinkActive="active">
+      <a routerLink="/partners" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
         <span class="icon">🤝</span>
         <span class="label" *ngIf="sidebarOpen">Partners</span>
       </a>
-      <a routerLink="/notifications" routerLinkActive="active">
+      <a routerLink="/notifications" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
         <span class="icon-wrap">
           <span class="icon">🔔</span>
           <span class="badge badge-icon" *ngIf="(unreadCount$ | async) as count">{{ count }}</span>
@@ -52,13 +52,13 @@
     </button>
   </aside>
 
-  <div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="toggleSidebar()"></div>
+  <div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="closeSidebarOnBackdrop()"></div>
 
   <div class="main-wrapper">
     <header class="mobile-topbar">
       <button class="mobile-menu-btn" (click)="toggleSidebar()" aria-label="Open menu">☰</button>
       <span class="mobile-topbar-title">✈ TravelMatch</span>
-      <a routerLink="/notifications" class="mobile-notif-link" aria-label="Notifications">
+      <a routerLink="/notifications" class="mobile-notif-link" aria-label="Notifications" (click)="closeSidebarAfterNavigation()">
         🔔
         <span class="badge badge-icon" *ngIf="(unreadCount$ | async) as count">{{ count }}</span>
       </a>

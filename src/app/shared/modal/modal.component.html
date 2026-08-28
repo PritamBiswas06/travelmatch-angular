@@ -1,0 +1,36 @@
+<div class="modal-backdrop" *ngIf="state" (click)="close()">
+  <section
+    class="travel-modal"
+    [ngClass]="'modal-' + state!.type"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="state!.title"
+    (click)="$event.stopPropagation()">
+
+    <button class="modal-close" type="button" aria-label="Close" (click)="close()">×</button>
+
+    <div class="modal-icon">{{ icon(state!.type) }}</div>
+
+    <div class="modal-content">
+      <h2>{{ state!.title }}</h2>
+      <p>{{ state!.message }}</p>
+    </div>
+
+    <div class="modal-actions">
+      <button
+        *ngIf="isConfirmation()"
+        type="button"
+        class="modal-btn modal-btn-secondary"
+        (click)="close()">
+        {{ state!.cancelText || 'Cancel' }}
+      </button>
+
+      <button
+        type="button"
+        class="modal-btn modal-btn-primary"
+        (click)="confirm()">
+        {{ state!.confirmText }}
+      </button>
+    </div>
+  </section>
+</div>
