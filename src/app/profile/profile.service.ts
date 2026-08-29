@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
+import { TravelerReview } from '../reviews/traveler-review.service';
+// import type { TravelerReview } from '../reviews/traveler-review.service';
 
 export interface ProfileTrip {
   id: number;
@@ -106,16 +108,4 @@ export class ProfileService {
   removeProfilePhoto(): Observable<UserProfile> {
     return this.http.delete<UserProfile>(`${this.baseUrl}/me/profile/photo`);
   }
-}
-
-export interface TravelerReview {
-  id: number;
-  reviewerId: number;
-  reviewerName: string;
-  travelPlanId: number;
-  destination: string;
-  rating: number;
-  tags: string[];
-  comment: string | null;
-  createdAt: string;
 }

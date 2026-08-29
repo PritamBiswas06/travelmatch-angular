@@ -1,0 +1,75 @@
+<div class="safety-backdrop" (click)="close()">
+  <section
+    class="report-dialog"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="targetType === 'user' ? 'Report user' : 'Report post'"
+    (click)="$event.stopPropagation()">
+
+    <button
+      type="button"
+      class="dialog-close"
+      aria-label="Close"
+      [disabled]="submitting"
+      (click)="close()">
+      ×
+    </button>
+
+    <div class="dialog-icon">🚩</div>
+
+    <div class="dialog-heading">
+      <span class="eyebrow">TRAVELMATCH SAFETY</span>
+      <h2>{{ targetType === 'user' ? 'Report User' : 'Report Post' }}</h2>
+      <p>
+        Help us keep TravelMatch welcoming and safe.
+        Your report is private and will be reviewed by the TravelMatch team.
+      </p>
+    </div>
+
+    <div class="report-form">
+      <label class="field-label" for="report-reason">Reason</label>
+
+      <select
+        id="report-reason"
+        [(ngModel)]="reason"
+        [disabled]="submitting">
+        <option value="" disabled>Select a reason</option>
+        <option *ngFor="let item of reasons" [value]="item.value">
+          {{ item.label }}
+        </option>
+      </select>
+
+      <label class="field-label" for="report-description">
+        Additional details <span>(optional)</span>
+      </label>
+
+      <textarea
+        id="report-description"
+        [(ngModel)]="description"
+        maxlength="500"
+        rows="5"
+        [disabled]="submitting"
+        placeholder="Tell us what happened..."></textarea>
+
+      <div class="character-count">{{ description.length }}/500</div>
+    </div>
+
+    <div class="dialog-actions">
+      <button
+        type="button"
+        class="cancel-btn"
+        [disabled]="submitting"
+        (click)="close()">
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="report-btn"
+        [disabled]="!reason || submitting"
+        (click)="submit()">
+        {{ submitting ? 'Submitting...' : 'Submit Report' }}
+      </button>
+    </div>
+  </section>
+</div>

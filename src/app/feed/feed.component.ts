@@ -13,6 +13,7 @@ import { MatchService } from '../match/match.service';
 import { LoaderService } from '../core/loader.service';
 import { LocationImageService } from './location-image.service';
 import { ProfileImageService } from '../core/profile-image.service';
+import { ReportDialogComponent } from '../shared/safety/report-dialog.component';
 
 type SortOption = 'latest' | 'popular' | 'match';
 
@@ -37,7 +38,7 @@ function emptyFilters(): FeedFilters {
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReportDialogComponent],
   templateUrl: './feed.component.html',
   styleUrls: ['./feed.component.css']
 })
@@ -59,6 +60,7 @@ export class FeedComponent implements OnInit {
   appliedFilters: FeedFilters = emptyFilters();
 
   selectedPost: FeedPost | null = null;
+  reportPostId: number | null = null;
 
   toastMessage: string | null = null;
   private toastTimeout: any;
@@ -339,6 +341,14 @@ onProfileImageError(
       () => (this.toastMessage = null),
       2500
     );
+  }
+
+  openReportPost(post: FeedPost): void {
+    this.reportPostId = post.id;
+  }
+
+  closeReportPost(): void {
+    this.reportPostId = null;
   }
 
   openTrip(post: FeedPost): void {

@@ -936,3 +936,41 @@
     font-size: 22px;
   }
 }
+/* ==================== PHASE 1 SAFETY ==================== */
+
+.header-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.post-menu-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 50%;
+  background: rgba(8,15,30,.55);
+  color: #e2e8f0;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.post-menu-btn:hover {
+  background: rgba(99,102,241,.25);
+  border-color: rgba(129,140,248,.55);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .header-badges {
+    gap: 5px;
+  }
+
+  .post-menu-btn {
+    width: 32px;
+    height: 32px;
+  }
+}

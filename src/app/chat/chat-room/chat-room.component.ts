@@ -55,7 +55,13 @@ export class ChatRoomComponent implements OnInit, AfterViewChecked {
         // sidebar badge so it reflects that immediately.
         this.notificationService.refreshUnreadCount();
       },
-      error: (err) => console.error("Could not load messages", err)
+      error: (err) => {
+        console.error('Could not load messages', err);
+        this.toast.error(
+          err?.error?.message ||
+          'Could not load this conversation.'
+        );
+      }
     });
   }
 
@@ -74,7 +80,12 @@ export class ChatRoomComponent implements OnInit, AfterViewChecked {
         this.newMessage = '';
         this.loadMessages();
       },
-      error: (err) => this.toast.error("Failed to send message")
+      error: (err) => {
+        this.toast.error(
+          err?.error?.message ||
+          'Failed to send message.'
+        );
+      }
     });
   }
 

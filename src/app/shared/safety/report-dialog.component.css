@@ -1,0 +1,179 @@
+ :host {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+}
+
+.safety-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(3, 7, 18, 0.78);
+  backdrop-filter: blur(10px);
+  animation: safetyFade .18s ease;
+}
+
+.report-dialog {
+  position: relative;
+  width: min(520px, 100%);
+  max-height: min(720px, calc(100vh - 40px));
+  overflow-y: auto;
+  padding: 30px;
+  border: 1px solid rgba(129, 140, 248, .28);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(236,72,153,.14), transparent 34%),
+    radial-gradient(circle at top left, rgba(34,211,238,.12), transparent 32%),
+    rgba(15, 23, 42, .97);
+  box-shadow: 0 28px 90px rgba(0,0,0,.48), 0 0 45px rgba(99,102,241,.13);
+  color: #f8fafc;
+}
+
+.dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.07);
+  color: #cbd5e1;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.dialog-close:hover:not(:disabled) {
+  background: rgba(255,255,255,.13);
+  color: #fff;
+}
+
+.dialog-icon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(236,72,153,.2), rgba(99,102,241,.24));
+  border: 1px solid rgba(236,72,153,.28);
+  font-size: 27px;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  color: #67e8f9;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+
+.dialog-heading h2 {
+  margin: 5px 0 8px;
+  font-size: 27px;
+}
+
+.dialog-heading p {
+  margin: 0;
+  color: #94a3b8;
+  line-height: 1.55;
+  font-size: 13px;
+}
+
+.report-form {
+  margin-top: 24px;
+}
+
+.field-label {
+  display: block;
+  margin: 0 0 8px;
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.field-label span {
+  color: #64748b;
+  font-weight: 500;
+}
+
+select,
+textarea {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 13px;
+  background: rgba(30,41,59,.85);
+  color: #fff;
+  padding: 12px 14px;
+  font: inherit;
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+select:focus,
+textarea:focus {
+  border-color: rgba(99,102,241,.75);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+}
+
+textarea {
+  margin-top: 16px;
+}
+
+.character-count {
+  text-align: right;
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.dialog-actions button {
+  flex: 1;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 0;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: rgba(255,255,255,.07);
+  color: #cbd5e1;
+}
+
+.report-btn {
+  background: linear-gradient(135deg, #ec4899, #6366f1);
+  color: white;
+  box-shadow: 0 10px 25px rgba(99,102,241,.2);
+}
+
+button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+@keyframes safetyFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 520px) {
+  .safety-backdrop { padding: 12px; }
+  .report-dialog {
+    padding: 24px 18px;
+    border-radius: 20px;
+  }
+  .dialog-heading h2 { font-size: 23px; }
+  .dialog-actions { flex-direction: column-reverse; }
+}

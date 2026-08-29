@@ -4,15 +4,16 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
   const token = localStorage.getItem('token');
 
-  if (token) {
-    const cloned = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    return next(cloned);
+  // Never attach an empty/invalid token.
+  if (!token || token.trim().length === 0) {
+    return next(req);
   }
 
-  return next(req);
+  const authReq = req.clone({
+    setHeaders: {
+      Authorization: `Bearer ${token.trim()}`
+    }
+  });
+
+  return next(authReq);
 };

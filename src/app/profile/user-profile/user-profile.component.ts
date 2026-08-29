@@ -15,6 +15,14 @@ import { MatchService } from '../../match/match.service';
 import { LoaderService } from '../../core/loader.service';
 import { ModalService } from '../../shared/modal/modal.service';
 import { ProfileImageService } from '../../core/profile-image.service';
+import { SafetyService } from '../../core/safety.service';
+import {
+  TravelerReviewService,
+  ReviewEligibility
+} from '../../reviews/traveler-review.service';
+
+import { ReportDialogComponent } from '../../shared/safety/report-dialog.component';
+import { ReviewDialogComponent } from '../../reviews/review-dialog/review-dialog.component';
 
 interface EditModel {
   name: string;
@@ -36,7 +44,13 @@ interface EditModel {
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    ReportDialogComponent,
+    ReviewDialogComponent
+  ],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css']
 })
@@ -146,6 +160,20 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   pendingActionIds = new Set<string>();
 
+  // ==================== SAFETY ====================
+
+  isBlocked = false;
+  checkingBlockStatus = false;
+  safetyBusy = false;
+
+  showReportDialog = false;
+
+  // ==================== REVIEWS ====================
+
+  showReviewDialog = false;
+  reviewEligibility: ReviewEligibility | null = null;
+  selectedReviewTripId: number | null = null;
+
   private routeSub?: Subscription;
 
   constructor(
@@ -155,7 +183,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private matchService: MatchService,
     private loader: LoaderService,
     private modalService: ModalService,
-    private profileImageService: ProfileImageService
+    private profileImageService: ProfileImageService,
+    private safetyService: SafetyService,
+    private travelerReviewService: TravelerReviewService
   ) {}
 
   // ==================== INIT ====================
@@ -197,13 +227,23 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.profileService.getProfile(this.userId).subscribe({
 
       next: (res) => {
+
         this.profile = res;
         this.loading = false;
+
+        this.isBlocked = false;
+        this.reviewEligibility = null;
+        this.selectedReviewTripId = null;
+
+        if (!res.isOwnProfile) {
+          this.loadSafetyState();
+          this.loadReviewEligibility();
+        }
       },
 
       error: (err) => {
 
-        console.error(err);
+        console.error('Could not load profile:', err);
 
         this.loading = false;
 
@@ -216,7 +256,303 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ==================== VIEW TRIP MODAL ====================
+  // ==================== SAFETY ====================
+
+  private loadSafetyState(): void {
+
+    if (
+      !this.userId ||
+      !this.profile ||
+      this.profile.isOwnProfile
+    ) {
+      return;
+    }
+
+    this.checkingBlockStatus = true;
+
+    this.safetyService.isBlocked(this.userId).subscribe({
+
+      next: result => {
+
+        this.isBlocked = !!result?.blocked;
+        this.checkingBlockStatus = false;
+      },
+
+      error: err => {
+
+        console.error(
+          'Could not check block status',
+          err
+        );
+
+        this.checkingBlockStatus = false;
+      }
+    });
+  }
+
+  async toggleBlockUser(): Promise<void> {
+
+    if (
+      !this.profile ||
+      this.profile.isOwnProfile ||
+      this.safetyBusy
+    ) {
+      return;
+    }
+
+    const blocking = !this.isBlocked;
+
+    const confirmed = await this.modalService.confirm(
+
+      blocking
+        ? `You will no longer be able to interact with ${this.profile.name}, and their content will be removed from your discovery experience.`
+        : `Unblock ${this.profile.name}? They will be allowed to interact with you again.`,
+
+      blocking
+        ? 'Block Traveler?'
+        : 'Unblock Traveler?',
+
+      blocking
+        ? 'Block User'
+        : 'Unblock',
+
+      'Cancel'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.safetyBusy = true;
+
+    const request$ = blocking
+      ? this.safetyService.blockUser(this.userId)
+      : this.safetyService.unblockUser(this.userId);
+
+    request$.subscribe({
+
+      next: () => {
+
+        this.isBlocked = blocking;
+        this.safetyBusy = false;
+
+        this.showToast(
+          blocking
+            ? 'Traveler blocked successfully.'
+            : 'Traveler unblocked successfully.'
+        );
+
+        if (blocking) {
+          this.selectedTrip = null;
+        }
+      },
+
+      error: err => {
+
+        this.safetyBusy = false;
+
+        console.error(
+          'Block/unblock failed:',
+          err
+        );
+
+        if (err?.status === 401) {
+
+          this.showToast(
+            'Please sign in again.'
+          );
+
+        } else if (err?.status === 403) {
+
+          this.showToast(
+            "You don't have permission to perform this action."
+          );
+
+        } else {
+
+          this.showToast(
+            err?.error?.message ||
+            (
+              blocking
+                ? 'Could not block this traveler.'
+                : 'Could not unblock this traveler.'
+            )
+          );
+        }
+      }
+    });
+  }
+
+  // ==================== REPORT USER ====================
+
+  openReportUser(): void {
+
+    if (
+      !this.profile ||
+      this.profile.isOwnProfile ||
+      this.isBlocked
+    ) {
+      return;
+    }
+
+    this.showReportDialog = true;
+  }
+
+  closeReportDialog(): void {
+    this.showReportDialog = false;
+  }
+
+  // ==================== REVIEWS ====================
+
+  private loadReviewEligibility(): void {
+
+    if (
+      !this.profile ||
+      this.profile.isOwnProfile
+    ) {
+      return;
+    }
+
+    this.travelerReviewService
+      .getEligibility(this.userId)
+      .subscribe({
+
+        next: result => {
+          this.reviewEligibility = result;
+        },
+
+        error: err => {
+
+          console.error(
+            'Could not check review eligibility:',
+            err
+          );
+
+          this.reviewEligibility = null;
+        }
+      });
+  }
+
+  get canLeaveReview(): boolean {
+
+    return !!this.reviewEligibility?.eligible
+      && (
+        this.reviewEligibility.travelPlanIds?.length ?? 0
+      ) > 0
+      && !this.isBlocked;
+  }
+
+  openReview(tripId?: number): void {
+
+    if (!this.canLeaveReview) {
+      return;
+    }
+
+    this.selectedReviewTripId =
+      tripId ??
+      this.reviewEligibility?.travelPlanIds?.[0] ??
+      null;
+
+    if (this.selectedReviewTripId) {
+      this.showReviewDialog = true;
+    }
+  }
+
+  closeReviewDialog(): void {
+
+    this.showReviewDialog = false;
+    this.selectedReviewTripId = null;
+  }
+
+  handleReviewSubmitted(
+    review: UserProfile['reviews'][number]
+  ): void {
+
+    if (!this.profile) {
+      return;
+    }
+
+    const existingIndex =
+      this.profile.reviews.findIndex(
+        item => item.id === review.id
+      );
+
+    const reviews = [
+      ...this.profile.reviews
+    ];
+
+    if (existingIndex >= 0) {
+
+      reviews[existingIndex] = review;
+
+    } else {
+
+      reviews.unshift(review);
+    }
+
+    const reviewCount = reviews.length;
+
+    const averageRating = reviewCount
+      ? Math.round(
+          (
+            reviews.reduce(
+              (sum, item) => sum + item.rating,
+              0
+            ) / reviewCount
+          ) * 10
+        ) / 10
+      : 0;
+
+    this.profile = {
+      ...this.profile,
+      reviews,
+      reviewCount,
+      averageRating
+    };
+
+    this.reviewEligibility = {
+
+      eligible: false,
+
+      travelPlanIds:
+        (
+          this.reviewEligibility?.travelPlanIds ?? []
+        ).filter(
+          id => id !== review.travelPlanId
+        )
+    };
+
+    this.showReviewDialog = false;
+    this.selectedReviewTripId = null;
+  }
+
+  reviewTagLabel(tag: string): string {
+
+    return tag
+      .toLowerCase()
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, char =>
+        char.toUpperCase()
+      );
+  }
+
+  reviewStars(rating: number): string {
+
+    const safe = Math.max(
+      0,
+      Math.min(
+        5,
+        Math.round(rating)
+      )
+    );
+
+    return (
+      '★'.repeat(safe) +
+      '☆'.repeat(5 - safe)
+    );
+  }
+
+  // ==================== TRIP MODAL ====================
 
   openTrip(trip: ProfileTrip): void {
     this.selectedTrip = trip;
@@ -228,86 +564,116 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   // ==================== DELETE TRIP ====================
 
-  async deleteTrip(trip: ProfileTrip): Promise<void> {
+  async deleteTrip(
+    trip: ProfileTrip
+  ): Promise<void> {
 
     if (!this.profile?.isOwnProfile) {
       return;
     }
 
-    const confirmed = await this.modalService.confirm(
-      `Delete your trip to ${trip.destination}?\n\nThis action cannot be undone.`,
-      'Delete this trip?',
-      'Yes, Delete',
-      'Keep Trip'
-    );
+    const confirmed =
+      await this.modalService.confirm(
+
+        `Delete your trip to ${trip.destination}?\n\nThis action cannot be undone.`,
+
+        'Delete this trip?',
+
+        'Yes, Delete',
+
+        'Keep Trip'
+      );
 
     if (!confirmed) {
       return;
     }
 
-    const key = this.actionKey(trip.id, 'delete');
+    const key = this.actionKey(
+      trip.id,
+      'delete'
+    );
 
-    if (this.pendingActionIds.has(key)) {
+    if (
+      this.pendingActionIds.has(key)
+    ) {
       return;
     }
 
     this.pendingActionIds.add(key);
 
-    this.loader.show('Deleting travel plan...');
+    this.loader.show(
+      'Deleting travel plan...'
+    );
 
-    this.profileService.deleteTravelPlan(trip.id).subscribe({
+    this.profileService
+      .deleteTravelPlan(trip.id)
+      .subscribe({
 
-      next: () => {
+        next: () => {
 
-        this.loader.hide();
-        this.pendingActionIds.delete(key);
+          this.loader.hide();
 
-        if (this.profile) {
-
-          this.profile = {
-            ...this.profile,
-
-            upcomingTrips: this.profile.upcomingTrips.filter(
-              t => t.id !== trip.id
-            )
-          };
-        }
-
-        if (this.selectedTrip?.id === trip.id) {
-          this.selectedTrip = null;
-        }
-
-        this.showToast('Travel plan deleted successfully.');
-      },
-
-      error: (err) => {
-
-        this.loader.hide();
-        this.pendingActionIds.delete(key);
-
-        console.error(err);
-
-        if (err?.status === 403) {
-
-          this.showToast(
-            'You can only delete your own travel plans.'
+          this.pendingActionIds.delete(
+            key
           );
 
-        } else if (err?.status === 404) {
+          if (this.profile) {
+
+            this.profile = {
+              ...this.profile,
+
+              upcomingTrips:
+                this.profile.upcomingTrips.filter(
+                  t => t.id !== trip.id
+                )
+            };
+          }
+
+          if (
+            this.selectedTrip?.id === trip.id
+          ) {
+            this.selectedTrip = null;
+          }
 
           this.showToast(
-            'Travel plan not found.'
+            'Travel plan deleted successfully.'
+          );
+        },
+
+        error: err => {
+
+          this.loader.hide();
+
+          this.pendingActionIds.delete(
+            key
           );
 
-        } else {
-
-          this.showToast(
-            err?.error?.message ||
-            'Could not delete travel plan.'
+          console.error(
+            'Delete travel plan failed:',
+            err
           );
+
+          if (err?.status === 403) {
+
+            this.showToast(
+              'You can only delete your own travel plans.'
+            );
+
+          } else if (err?.status === 404) {
+
+            this.showToast(
+              'Travel plan not found.'
+            );
+
+          } else {
+
+            this.showToast(
+              err?.error?.message ||
+              'Could not delete travel plan.'
+            );
+          }
         }
-      }
-    });
+      });
   }
 
   // ==================== MATCH REQUEST ====================
@@ -316,6 +682,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     tripId: number,
     action: string
   ): string {
+
     return `${tripId}:${action}`;
   }
 
@@ -323,16 +690,24 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     tripId: number,
     action: string
   ): boolean {
+
     return this.pendingActionIds.has(
       this.actionKey(tripId, action)
     );
   }
 
-  sendMatchRequest(trip: ProfileTrip): void {
+  sendMatchRequest(
+    trip: ProfileTrip
+  ): void {
 
-    const key = this.actionKey(trip.id, 'match');
+    const key = this.actionKey(
+      trip.id,
+      'match'
+    );
 
-    if (this.pendingActionIds.has(key)) {
+    if (
+      this.pendingActionIds.has(key)
+    ) {
       return;
     }
 
@@ -349,32 +724,52 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       'Sending travel match request...'
     );
 
-    this.matchService.sendMatchRequest(trip.id).subscribe({
+    this.matchService
+      .sendMatchRequest(trip.id)
+      .subscribe({
 
-      next: () => {
+        next: () => {
 
-        this.loader.hide();
-        this.pendingActionIds.delete(key);
+          this.loader.hide();
 
-        this.updateTripStatus(
-          trip.id,
-          'PENDING'
-        );
-      },
+          this.pendingActionIds.delete(
+            key
+          );
 
-      error: (err) => {
+          this.updateTripStatus(
+            trip.id,
+            'PENDING'
+          );
+        },
 
-        this.loader.hide();
-        this.pendingActionIds.delete(key);
+        error: err => {
 
-        console.error(err);
+          this.loader.hide();
 
-        this.showToast(
-          err?.error?.message ||
-          'Could not send request'
-        );
-      }
-    });
+          this.pendingActionIds.delete(
+            key
+          );
+
+          console.error(
+            'Match request failed:',
+            err
+          );
+
+          if (err?.status === 403) {
+
+            this.showToast(
+              'You cannot send a match request to this traveler.'
+            );
+
+          } else {
+
+            this.showToast(
+              err?.error?.message ||
+              'Could not send request.'
+            );
+          }
+        }
+      });
   }
 
   private updateTripStatus(
@@ -391,31 +786,41 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     }
 
     this.profile = {
+
       ...this.profile,
 
       upcomingTrips:
-        this.profile.upcomingTrips.map(t =>
-          t.id === tripId
-            ? {
-                ...t,
-                matchRequestStatus: status
-              }
-            : t
+        this.profile.upcomingTrips.map(
+          trip =>
+            trip.id === tripId
+              ? {
+                  ...trip,
+                  matchRequestStatus: status
+                }
+              : trip
         )
     };
 
-    if (this.selectedTrip?.id === tripId) {
+    if (
+      this.selectedTrip?.id === tripId
+    ) {
 
       this.selectedTrip = {
+
         ...this.selectedTrip,
+
         matchRequestStatus: status
       };
     }
   }
 
-  matchButtonLabel(trip: ProfileTrip): string {
+  matchButtonLabel(
+    trip: ProfileTrip
+  ): string {
 
-    switch (trip.matchRequestStatus) {
+    switch (
+      trip.matchRequestStatus
+    ) {
 
       case 'PENDING':
         return 'Request Sent';
@@ -436,6 +841,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   private emptyEditModel(): EditModel {
 
     return {
+
       name: '',
       username: '',
       age: null,
@@ -537,7 +943,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     return list;
   }
 
-  toggleTravelStyle(value: string): void {
+  toggleTravelStyle(
+    value: string
+  ): void {
 
     this.editTravelStyle =
       this.toggleChip(
@@ -546,7 +954,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       );
   }
 
-  toggleTravelInterest(value: string): void {
+  toggleTravelInterest(
+    value: string
+  ): void {
 
     this.editTravelInterests =
       this.toggleChip(
@@ -555,7 +965,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       );
   }
 
-  toggleLanguage(value: string): void {
+  toggleLanguage(
+    value: string
+  ): void {
 
     this.editLanguages =
       this.toggleChip(
@@ -564,7 +976,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       );
   }
 
-  onBudgetSelectChange(value: string): void {
+  onBudgetSelectChange(
+    value: string
+  ): void {
 
     if (value === 'Custom') {
 
@@ -589,8 +1003,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
     const alreadyExists =
       this.editPreferredDestinations.some(
-        d =>
-          d.toLowerCase() ===
+        destination =>
+          destination.toLowerCase() ===
           value.toLowerCase()
       );
 
@@ -605,11 +1019,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.destinationInput = '';
   }
 
-  removeDestination(value: string): void {
+  removeDestination(
+    value: string
+  ): void {
 
     this.editPreferredDestinations =
       this.editPreferredDestinations.filter(
-        d => d !== value
+        destination =>
+          destination !== value
       );
   }
 
@@ -622,7 +1039,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     if (!this.editModel.name.trim()) {
 
       this.showToast(
-        'Name cannot be empty'
+        'Name cannot be empty.'
       );
 
       return;
@@ -676,9 +1093,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       .updateMyProfile(payload)
       .subscribe({
 
-        next: (res) => {
+        next: res => {
 
           this.profile = res;
+
           this.isEditing = false;
           this.savingProfile = false;
 
@@ -687,15 +1105,18 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           );
         },
 
-        error: (err) => {
+        error: err => {
 
-          console.error(err);
+          console.error(
+            'Profile update failed:',
+            err
+          );
 
           this.savingProfile = false;
 
           this.showToast(
             err?.error?.message ||
-            'Could not update profile'
+            'Could not update profile.'
           );
         }
       });
@@ -703,7 +1124,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   // ==================== PROFILE PHOTO ====================
 
-  onPhotoSelected(event: Event): void {
+  onPhotoSelected(
+    event: Event
+  ): void {
 
     const input =
       event.target as HTMLInputElement;
@@ -729,7 +1152,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     if (!allowedTypes.includes(file.type)) {
 
       this.photoError =
-        'Photo must be a JPEG, PNG, or WEBP image';
+        'Photo must be a JPEG, PNG, or WEBP image.';
 
       return;
     }
@@ -740,7 +1163,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     if (file.size > maxSizeBytes) {
 
       this.photoError =
-        'Photo must be smaller than 2MB';
+        'Photo must be smaller than 2MB.';
 
       return;
     }
@@ -758,19 +1181,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     reader.readAsDataURL(file);
   }
 
-  /**
-   * Returns the real uploaded image when available.
-   * Otherwise ProfileImageService returns the correct
-   * gender-based default avatar.
-   */
   getProfileImage(): string {
 
     if (!this.profile) {
-      return this.profileImageService.getProfileImage(null);
+
+      return this.profileImageService
+        .getProfileImage(null);
     }
 
-    // When a new photo has been selected but not uploaded yet,
-    // show the local preview.
     if (this.photoPreviewUrl) {
       return this.photoPreviewUrl;
     }
@@ -781,10 +1199,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Fallback when the image URL/data URI cannot be loaded.
-   */
-  onProfileImageError(event: Event): void {
+  onProfileImageError(
+    event: Event
+  ): void {
 
     if (!this.profile) {
       return;
@@ -794,7 +1211,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       event,
       {
         gender: this.profile.gender,
-        profilePhotoUrl: this.profile.profilePhotoUrl
+        profilePhotoUrl:
+          this.profile.profilePhotoUrl
       }
     );
   }
@@ -817,15 +1235,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       )
       .subscribe({
 
-        next: (res) => {
+        next: res => {
 
-          /*
-           * IMPORTANT:
-           * The backend returns the updated profile.
-           * Replacing this.profile immediately makes
-           * the real uploaded image visible without
-           * logout/login.
-           */
           this.profile = res;
 
           this.uploadingPhoto = false;
@@ -833,19 +1244,22 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           this.resetPhotoSelection();
 
           this.showToast(
-            'Profile photo updated'
+            'Profile photo updated.'
           );
         },
 
-        error: (err) => {
+        error: err => {
 
-          console.error(err);
+          console.error(
+            'Photo upload failed:',
+            err
+          );
 
           this.uploadingPhoto = false;
 
           this.photoError =
             err?.error?.message ||
-            'Could not upload photo';
+            'Could not upload photo.';
         }
       });
   }
@@ -860,12 +1274,17 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const confirmed = await this.modalService.confirm(
-      'Remove your current profile photo?',
-      'Remove profile photo?',
-      'Yes, Remove',
-      'Keep Photo'
-    );
+    const confirmed =
+      await this.modalService.confirm(
+
+        'Remove your current profile photo?',
+
+        'Remove profile photo?',
+
+        'Yes, Remove',
+
+        'Keep Photo'
+      );
 
     if (!confirmed) {
       return;
@@ -877,14 +1296,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       .removeProfilePhoto()
       .subscribe({
 
-        next: (res) => {
+        next: res => {
 
-          /*
-           * Backend clears the photo and returns
-           * the updated profile. The centralized
-           * image resolver will immediately switch
-           * back to the gender-based default.
-           */
           this.profile = res;
 
           this.uploadingPhoto = false;
@@ -892,19 +1305,22 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           this.resetPhotoSelection();
 
           this.showToast(
-            'Profile photo removed'
+            'Profile photo removed.'
           );
         },
 
-        error: (err) => {
+        error: err => {
 
-          console.error(err);
+          console.error(
+            'Photo removal failed:',
+            err
+          );
 
           this.uploadingPhoto = false;
 
           this.showToast(
             err?.error?.message ||
-            'Could not remove photo'
+            'Could not remove photo.'
           );
         }
       });
@@ -940,7 +1356,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       profile.state,
       profile.country
     ]
-      .filter(v => !!v)
+      .filter(value => !!value)
       .join(', ');
   }
 
@@ -955,11 +1371,11 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     );
 
     this.toastTimeout =
-      setTimeout(
-        () =>
-          (this.toastMessage = null),
-        2500
-      );
+      setTimeout(() => {
+
+        this.toastMessage = null;
+
+      }, 2500);
   }
 
   trackByTripId(

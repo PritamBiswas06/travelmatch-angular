@@ -51,7 +51,10 @@ export class MatchesComponent implements OnInit {
       },
       error: (err) => {
         this.loader.hide();
-        this.toast.error('Request failed or already sent.');
+        this.toast.error(
+          err?.error?.message ||
+          'Request failed. Please try again.'
+        );
         console.error(err);
       }
     });

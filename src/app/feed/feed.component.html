@@ -244,6 +244,15 @@
 
           <div class="header-badges">
             <span class="status-badge">🟢 {{ post.status | titlecase }}</span>
+
+            <button
+              type="button"
+              class="post-menu-btn"
+              aria-label="Report this post"
+              title="Report post"
+              (click)="openReportPost(post)">
+              ⋮
+            </button>
           </div>
         </div>
 
@@ -442,4 +451,11 @@
       </div>
     </div>
   </div>
+  <app-report-dialog
+    *ngIf="reportPostId !== null"
+    targetType="post"
+    [targetId]="reportPostId"
+    (closed)="closeReportPost()">
+  </app-report-dialog>
+
 </div>

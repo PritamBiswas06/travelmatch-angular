@@ -1,0 +1,93 @@
+<div class="review-backdrop" (click)="close()">
+  <section
+    class="review-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Leave a travel review"
+    (click)="$event.stopPropagation()">
+
+    <button
+      type="button"
+      class="dialog-close"
+      aria-label="Close"
+      [disabled]="submitting"
+      (click)="close()">×</button>
+
+    <div class="review-icon">⭐</div>
+
+    <span class="eyebrow">TRAVELMATCH REVIEW</span>
+    <h2>How was your trip?</h2>
+    <p class="intro">
+      Share your experience with {{ travelerName }} to help other travelers.
+    </p>
+
+    <div class="rating-block">
+      <span class="field-title">Your rating</span>
+
+      <div class="stars" role="radiogroup" aria-label="Rating from 1 to 5 stars">
+        <button
+          *ngFor="let star of [1,2,3,4,5]"
+          type="button"
+          class="star"
+          [class.selected]="star <= rating"
+          [attr.aria-label]="star + ' star' + (star > 1 ? 's' : '')"
+          [attr.aria-checked]="star === rating"
+          role="radio"
+          [disabled]="submitting"
+          (click)="setRating(star)">
+          ★
+        </button>
+      </div>
+
+      <small>{{ rating ? rating + ' / 5' : 'Select a rating' }}</small>
+    </div>
+
+    <div class="tags-block">
+      <span class="field-title">What stood out?</span>
+
+      <div class="tag-list">
+        <button
+          *ngFor="let tag of tagOptions"
+          type="button"
+          class="review-tag"
+          [class.selected]="tags.includes(tag.value)"
+          [disabled]="submitting"
+          (click)="toggleTag(tag.value)">
+          {{ tag.label }}
+        </button>
+      </div>
+    </div>
+
+    <label class="field-title" for="review-comment">
+      Comment <span>(optional)</span>
+    </label>
+
+    <textarea
+      id="review-comment"
+      [(ngModel)]="comment"
+      maxlength="500"
+      rows="4"
+      [disabled]="submitting"
+      placeholder="Tell us about your travel experience..."></textarea>
+
+    <div class="character-count">{{ comment.length }}/500</div>
+
+    <div class="dialog-actions">
+      <button
+        type="button"
+        class="cancel-btn"
+        [disabled]="submitting"
+        (click)="close()">
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="submit-btn"
+        [disabled]="rating === 0 || submitting"
+        (click)="submit()">
+        {{ submitting ? 'Submitting...' : 'Submit Review' }}
+      </button>
+    </div>
+  </section>
+</div>
