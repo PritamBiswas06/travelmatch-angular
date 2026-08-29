@@ -45,6 +45,10 @@ export interface UserProfile {
 
   isOwnProfile: boolean;
   upcomingTrips: ProfileTrip[];
+
+  averageRating: number;
+  reviewCount: number;
+  reviews: TravelerReview[];
 }
 
 export interface UpdateProfileRequest {
@@ -69,10 +73,9 @@ export interface UpdateProfileRequest {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProfileService {
-
   private baseUrl = `${API_BASE_URL}/users`;
 
   constructor(private http: HttpClient) {}
@@ -82,8 +85,8 @@ export class ProfileService {
   }
 
   deleteTravelPlan(planId: number): Observable<void> {
-  return this.http.delete<void>(`${API_BASE_URL}/travel/${planId}`);
-}
+    return this.http.delete<void>(`${API_BASE_URL}/travel/${planId}`);
+  }
 
   updateMyProfile(data: UpdateProfileRequest): Observable<UserProfile> {
     return this.http.put<UserProfile>(`${this.baseUrl}/me/profile`, data);
@@ -94,11 +97,25 @@ export class ProfileService {
     formData.append('file', file);
     // No explicit Content-Type header here — the browser sets the
     // multipart boundary automatically when the body is a FormData.
-    return this.http.post<UserProfile>(`${this.baseUrl}/me/profile/photo`, formData);
+    return this.http.post<UserProfile>(
+      `${this.baseUrl}/me/profile/photo`,
+      formData,
+    );
   }
 
   removeProfilePhoto(): Observable<UserProfile> {
     return this.http.delete<UserProfile>(`${this.baseUrl}/me/profile/photo`);
   }
-  
+}
+
+export interface TravelerReview {
+  id: number;
+  reviewerId: number;
+  reviewerName: string;
+  travelPlanId: number;
+  destination: string;
+  rating: number;
+  tags: string[];
+  comment: string | null;
+  createdAt: string;
 }
