@@ -799,6 +799,51 @@
   display: flex;
   gap: 10px;
 }
+.profile-avatar {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+
+  border: 2px solid rgba(255, 255, 255, 0.28);
+
+  background: rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.25);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.04);
+  border-color: rgba(134, 168, 231, 0.8);
+}
+
+.profile-avatar.large {
+  width: 58px;
+  height: 58px;
+  min-width: 58px;
+}
+
+@media (max-width: 600px) {
+
+  .profile-avatar {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+
+  .profile-avatar.large {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+  }
+}
 
 /* TABLET */
 @media (max-width: 1024px) {

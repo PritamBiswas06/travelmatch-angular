@@ -14,6 +14,7 @@ import {
 import { MatchService } from '../../match/match.service';
 import { LoaderService } from '../../core/loader.service';
 import { ModalService } from '../../shared/modal/modal.service';
+import { ProfileImageService } from '../../core/profile-image.service';
 
 interface EditModel {
   name: string;
@@ -105,6 +106,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   // ==================== STATE ====================
 
   userId!: number;
+
   profile: UserProfile | null = null;
 
   loading = true;
@@ -137,6 +139,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   // ==================== TOAST ====================
 
   toastMessage: string | null = null;
+
   private toastTimeout: any;
 
   // ==================== ACTIONS ====================
@@ -151,7 +154,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private profileService: ProfileService,
     private matchService: MatchService,
     private loader: LoaderService,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private profileImageService: ProfileImageService
   ) {}
 
   // ==================== INIT ====================
@@ -226,8 +230,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   async deleteTrip(trip: ProfileTrip): Promise<void> {
 
-    // Extra frontend protection:
-    // Delete button should only work on the owner's profile.
     if (!this.profile?.isOwnProfile) {
       return;
     }
@@ -260,7 +262,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         this.loader.hide();
         this.pendingActionIds.delete(key);
 
-        // Remove the deleted trip immediately from the profile UI
         if (this.profile) {
 
           this.profile = {
@@ -272,7 +273,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           };
         }
 
-        // If the deleted trip's modal was open, close it.
         if (this.selectedTrip?.id === trip.id) {
           this.selectedTrip = null;
         }
@@ -469,16 +469,22 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       state: this.profile.state || '',
       country: this.profile.country || '',
       bio: this.profile.bio || '',
+
       budgetPreference:
         this.profile.budgetPreference || '',
+
       travelFrequency:
         this.profile.travelFrequency || '',
+
       idealTravelPartner:
         this.profile.idealTravelPartner || '',
+
       instagramUrl:
         this.profile.instagramUrl || '',
+
       linkedinUrl:
         this.profile.linkedinUrl || '',
+
       websiteUrl:
         this.profile.websiteUrl || ''
     };
@@ -634,16 +640,22 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       state: this.editModel.state,
       country: this.editModel.country,
       bio: this.editModel.bio,
+
       budgetPreference:
         this.editModel.budgetPreference,
+
       travelFrequency:
         this.editModel.travelFrequency,
+
       idealTravelPartner:
         this.editModel.idealTravelPartner,
+
       instagramUrl:
         this.editModel.instagramUrl,
+
       linkedinUrl:
         this.editModel.linkedinUrl,
+
       websiteUrl:
         this.editModel.websiteUrl,
 
@@ -699,6 +711,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     const file =
       input.files?.[0];
 
+    // Allow selecting the same file again.
     input.value = '';
 
     if (!file) {
@@ -745,6 +758,47 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     reader.readAsDataURL(file);
   }
 
+  /**
+   * Returns the real uploaded image when available.
+   * Otherwise ProfileImageService returns the correct
+   * gender-based default avatar.
+   */
+  getProfileImage(): string {
+
+    if (!this.profile) {
+      return this.profileImageService.getProfileImage(null);
+    }
+
+    // When a new photo has been selected but not uploaded yet,
+    // show the local preview.
+    if (this.photoPreviewUrl) {
+      return this.photoPreviewUrl;
+    }
+
+    return this.profileImageService.getProfileImage({
+      gender: this.profile.gender,
+      profilePhotoUrl: this.profile.profilePhotoUrl
+    });
+  }
+
+  /**
+   * Fallback when the image URL/data URI cannot be loaded.
+   */
+  onProfileImageError(event: Event): void {
+
+    if (!this.profile) {
+      return;
+    }
+
+    this.profileImageService.handleImageError(
+      event,
+      {
+        gender: this.profile.gender,
+        profilePhotoUrl: this.profile.profilePhotoUrl
+      }
+    );
+  }
+
   savePhoto(): void {
 
     if (
@@ -765,7 +819,15 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
         next: (res) => {
 
+          /*
+           * IMPORTANT:
+           * The backend returns the updated profile.
+           * Replacing this.profile immediately makes
+           * the real uploaded image visible without
+           * logout/login.
+           */
           this.profile = res;
+
           this.uploadingPhoto = false;
 
           this.resetPhotoSelection();
@@ -817,7 +879,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
         next: (res) => {
 
+          /*
+           * Backend clears the photo and returns
+           * the updated profile. The centralized
+           * image resolver will immediately switch
+           * back to the gender-based default.
+           */
           this.profile = res;
+
           this.uploadingPhoto = false;
 
           this.resetPhotoSelection();

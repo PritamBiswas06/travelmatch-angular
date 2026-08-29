@@ -2,10 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FeedService, FeedPost, FeedFilters } from './feed.service';
+
+import {
+  FeedService,
+  FeedPost,
+  FeedFilters
+} from './feed.service';
+
 import { MatchService } from '../match/match.service';
 import { LoaderService } from '../core/loader.service';
 import { LocationImageService } from './location-image.service';
+import { ProfileImageService } from '../core/profile-image.service';
 
 type SortOption = 'latest' | 'popular' | 'match';
 
@@ -59,12 +66,15 @@ export class FeedComponent implements OnInit {
   pendingActionIds = new Set<string>();
 
   constructor(
-    private feedService: FeedService,
-    private matchService: MatchService,
-    private loader: LoaderService,
-    private router: Router,
-    public locationImageService: LocationImageService
-  ) {}
+  private feedService: FeedService,
+  private matchService: MatchService,
+  private loader: LoaderService,
+  private router: Router,
+
+  public locationImageService: LocationImageService,
+
+  public profileImageService: ProfileImageService
+) {}
 
   ngOnInit(): void {
     this.loadFeed();
@@ -200,6 +210,27 @@ export class FeedComponent implements OnInit {
 
     return chips;
   }
+
+  getProfileImage(post: FeedPost): string {
+  return this.profileImageService.getProfileImage({
+    gender: post.userGender,
+    profilePhotoUrl: post.profilePhotoUrl
+  });
+}
+
+onProfileImageError(
+  event: Event,
+  post: FeedPost
+): void {
+
+  this.profileImageService.handleImageError(
+    event,
+    {
+      gender: post.userGender,
+      profilePhotoUrl: post.profilePhotoUrl
+    }
+  );
+}
 
   get hasActiveFilters(): boolean {
     return this.activeFilterChips.length > 0;

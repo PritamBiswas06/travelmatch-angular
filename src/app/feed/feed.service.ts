@@ -10,9 +10,14 @@ export interface CompatibilityFactor {
 
 export interface FeedPost {
   id: number;
+
   userId: number;
   userName: string;
   userCity: string | null;
+
+  // Profile image information
+  userGender: string | null;
+  profilePhotoUrl: string | null;
 
   fromLocation: string;
   destination: string;
@@ -31,7 +36,11 @@ export interface FeedPost {
   shareCount: number;
 
   currentUserReaction: 'LIKE' | 'DISLIKE' | null;
-  matchRequestStatus: 'NONE' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  matchRequestStatus:
+    | 'NONE'
+    | 'PENDING'
+    | 'ACCEPTED'
+    | 'REJECTED';
 }
 
 export interface FeedFilters {
@@ -39,7 +48,7 @@ export interface FeedFilters {
   fromLocation?: string;
   minBudget?: number | null;
   maxBudget?: number | null;
-  startDate?: string | null; // yyyy-MM-dd
+  startDate?: string | null;
   endDate?: string | null;
   travelType?: string;
   minMatchScore?: number | null;
@@ -54,32 +63,97 @@ export class FeedService {
 
   constructor(private http: HttpClient) {}
 
-  getFeed(sort: 'latest' | 'popular' | 'match' = 'latest', filters?: FeedFilters): Observable<FeedPost[]> {
-    let params = new HttpParams().set('sort', sort);
+  getFeed(
+    sort: 'latest' | 'popular' | 'match' = 'latest',
+    filters?: FeedFilters
+  ): Observable<FeedPost[]> {
+
+    let params = new HttpParams()
+      .set('sort', sort);
 
     if (filters) {
-      if (filters.destination) params = params.set('destination', filters.destination);
-      if (filters.fromLocation) params = params.set('fromLocation', filters.fromLocation);
-      if (filters.minBudget != null) params = params.set('minBudget', filters.minBudget);
-      if (filters.maxBudget != null) params = params.set('maxBudget', filters.maxBudget);
-      if (filters.startDate) params = params.set('startDate', filters.startDate);
-      if (filters.endDate) params = params.set('endDate', filters.endDate);
-      if (filters.travelType) params = params.set('travelType', filters.travelType);
-      if (filters.minMatchScore != null) params = params.set('minMatchScore', filters.minMatchScore);
+
+      if (filters.destination) {
+        params = params.set(
+          'destination',
+          filters.destination
+        );
+      }
+
+      if (filters.fromLocation) {
+        params = params.set(
+          'fromLocation',
+          filters.fromLocation
+        );
+      }
+
+      if (filters.minBudget != null) {
+        params = params.set(
+          'minBudget',
+          filters.minBudget
+        );
+      }
+
+      if (filters.maxBudget != null) {
+        params = params.set(
+          'maxBudget',
+          filters.maxBudget
+        );
+      }
+
+      if (filters.startDate) {
+        params = params.set(
+          'startDate',
+          filters.startDate
+        );
+      }
+
+      if (filters.endDate) {
+        params = params.set(
+          'endDate',
+          filters.endDate
+        );
+      }
+
+      if (filters.travelType) {
+        params = params.set(
+          'travelType',
+          filters.travelType
+        );
+      }
+
+      if (filters.minMatchScore != null) {
+        params = params.set(
+          'minMatchScore',
+          filters.minMatchScore
+        );
+      }
     }
 
-    return this.http.get<FeedPost[]>(`${this.baseUrl}/feed`, { params });
+    return this.http.get<FeedPost[]>(
+      `${this.baseUrl}/feed`,
+      { params }
+    );
   }
 
   like(planId: number): Observable<FeedPost> {
-    return this.http.post<FeedPost>(`${this.baseUrl}/${planId}/like`, {});
+    return this.http.post<FeedPost>(
+      `${this.baseUrl}/${planId}/like`,
+      {}
+    );
   }
 
   dislike(planId: number): Observable<FeedPost> {
-    return this.http.post<FeedPost>(`${this.baseUrl}/${planId}/dislike`, {});
+    return this.http.post<FeedPost>(
+      `${this.baseUrl}/${planId}/dislike`,
+      {}
+    );
   }
 
   share(planId: number): Observable<FeedPost> {
-    return this.http.post<FeedPost>(`${this.baseUrl}/${planId}/share`, {});
+    return this.http.post<FeedPost>(
+      `${this.baseUrl}/${planId}/share`,
+      {}
+    );
   }
 }
