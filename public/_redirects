@@ -1,2 +1,14 @@
-/api/* https://travelmatch1.up.railway.app/api/:splat 200
-/* /index.html 200
+# API calls stay on the same origin as the app (https://tripmatch.fun/api/...)
+# and are proxied server-side to Railway with a 200 rewrite (NOT a redirect),
+# so the browser never sees or needs the Railway URL, and query strings
+# (e.g. ?sort=latest) pass straight through via :splat.
+#
+# The trailing "!" forces this rule to win even if something under /api/
+# happens to match a static asset path - it must always go to Railway,
+# never be served as a local file. This rule MUST stay above the SPA
+# fallback below, since Netlify matches rules top-to-bottom.
+/api/*  https://travelmatch1.up.railway.app/api/:splat  200!
+
+# SPA fallback for client-side (Angular Router) navigation - must come
+# after the API rule above.
+/*      /index.html  200

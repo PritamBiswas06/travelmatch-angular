@@ -8,8 +8,6 @@ import { API_BASE_URL } from '../config/api.config';
 export class PartnerService {
 
   private baseUrl= `${API_BASE_URL}/partner`;
-  // private baseUrl = 'http://localhost:8080/api/partner';
-  // private baseUrl = 'https://travelmatch1.up.railway.app/api/partner';
 
   constructor(private http: HttpClient) {}
 

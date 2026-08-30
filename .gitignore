@@ -1,3 +1,36 @@
-node_modules/
+# Compiled output
 dist/
+tmp/
+out-tsc/
+node_modules/
 .angular/
+
+# IDE
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Local env overrides - never commit real secrets/keys here.
+.env
+.env.*
+
+# Miscellaneous
+.sass-cache/
+connect.lock
+coverage/
+libpeerconnection.log
+testem.log
+typings/
+
+# System files
+.DS_Store
+Thumbs.db

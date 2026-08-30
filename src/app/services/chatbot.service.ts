@@ -13,8 +13,6 @@ export class ChatbotService {
 
   return this.http.post(
     `${API_BASE_URL}/chat/chatbot`,
-    // 'http://localhost:8080/api/chat/chatbot',
-    // 'https://travelmatch1.up.railway.app/api/chat/chatbot',
     { message: message }
   );
 
