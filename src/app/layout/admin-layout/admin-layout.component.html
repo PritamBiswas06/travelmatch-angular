@@ -1,0 +1,308 @@
+<div class="admin-layout">
+
+  <!-- ================================================= -->
+  <!-- ADMIN SIDEBAR -->
+  <!-- ================================================= -->
+
+  <aside
+    class="admin-sidebar"
+    [class.collapsed]="!sidebarOpen"
+    (mouseenter)="onSidebarEnter()"
+    (mouseleave)="onSidebarLeave()"
+  >
+
+    <!-- HEADER -->
+    <div class="sidebar-header">
+
+      <div class="brand">
+
+        <span class="brand-icon">
+          🛡️
+        </span>
+
+        <div
+          class="brand-text"
+          *ngIf="sidebarOpen"
+        >
+          <strong>TravelMatch</strong>
+          <small>ADMIN</small>
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        class="toggle-btn"
+        (click)="toggleSidebar()"
+        aria-label="Toggle admin sidebar"
+      >
+        {{ sidebarOpen ? '‹' : '›' }}
+      </button>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ADMIN NAVIGATION -->
+    <!-- ================================================= -->
+
+    <nav class="admin-nav">
+
+      <div
+        class="nav-section-title"
+        *ngIf="sidebarOpen"
+      >
+        ADMIN CONSOLE
+      </div>
+
+
+      <!-- Dashboard -->
+      <a
+        routerLink="/admin/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeSidebarAfterNavigation()"
+      >
+        <span class="icon">📊</span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Dashboard
+        </span>
+      </a>
+
+
+      <!-- Users -->
+      <a
+        routerLink="/admin/users"
+        routerLinkActive="active"
+        (click)="closeSidebarAfterNavigation()"
+      >
+        <span class="icon">👥</span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Users
+        </span>
+      </a>
+
+
+      <!-- Trips -->
+      <a
+        routerLink="/admin/trips"
+        routerLinkActive="active"
+        (click)="closeSidebarAfterNavigation()"
+      >
+        <span class="icon">✈️</span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Trips
+        </span>
+      </a>
+
+
+      <!-- Reports -->
+      <a
+        routerLink="/admin/reports"
+        routerLinkActive="active"
+        (click)="closeSidebarAfterNavigation()"
+      >
+        <span class="icon">🚨</span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Reports
+        </span>
+      </a>
+
+
+      <!-- Reviews -->
+      <a
+        routerLink="/admin/reviews"
+        routerLinkActive="active"
+        (click)="closeSidebarAfterNavigation()"
+      >
+        <span class="icon">⭐</span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Reviews
+        </span>
+      </a>
+
+
+      <!-- Match Requests -->
+      <a
+        routerLink="/admin/match-requests"
+        routerLinkActive="active"
+        (click)="closeSidebarAfterNavigation()"
+      >
+        <span class="icon">🤝</span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Match Requests
+        </span>
+      </a>
+
+
+      <!-- Partners -->
+      <a
+        routerLink="/admin/partners"
+        routerLinkActive="active"
+        (click)="closeSidebarAfterNavigation()"
+      >
+        <span class="icon">👫</span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Partners
+        </span>
+      </a>
+
+
+      <!-- Audit Logs -->
+      <a
+        routerLink="/admin/audit-logs"
+        routerLinkActive="active"
+        (click)="closeSidebarAfterNavigation()"
+      >
+        <span class="icon">📜</span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Audit Logs
+        </span>
+      </a>
+
+
+      <!-- Divider -->
+      <div class="nav-divider"></div>
+
+
+      <!-- Back to TravelMatch -->
+      <button
+        type="button"
+        class="back-btn"
+        (click)="backToTravelMatch()"
+      >
+
+        <span class="icon">←</span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Back to TravelMatch
+        </span>
+
+      </button>
+
+    </nav>
+
+
+    <!-- ================================================= -->
+    <!-- ADMIN PROFILE -->
+    <!-- ================================================= -->
+
+    <div class="admin-profile">
+
+      <div class="admin-avatar">
+        {{ adminName.charAt(0).toUpperCase() }}
+      </div>
+
+      <div
+        class="admin-info"
+        *ngIf="sidebarOpen"
+      >
+        <strong>{{ adminName }}</strong>
+        <span>Administrator</span>
+      </div>
+
+    </div>
+
+
+    <!-- LOGOUT -->
+    <button
+      type="button"
+      class="logout"
+      (click)="logout()"
+    >
+
+      <span class="icon">🚪</span>
+
+      <span
+        class="label"
+        *ngIf="sidebarOpen"
+      >
+        Logout
+      </span>
+
+    </button>
+
+  </aside>
+
+
+  <!-- ================================================= -->
+  <!-- MOBILE BACKDROP -->
+  <!-- ================================================= -->
+
+  <div
+    class="sidebar-backdrop"
+    *ngIf="sidebarOpen"
+    (click)="closeSidebarOnBackdrop()"
+  ></div>
+
+
+  <!-- ================================================= -->
+  <!-- MAIN -->
+  <!-- ================================================= -->
+
+  <div class="admin-main">
+
+    <!-- MOBILE TOPBAR -->
+    <header class="mobile-topbar">
+
+      <button
+        type="button"
+        class="mobile-menu-btn"
+        (click)="toggleSidebar()"
+        aria-label="Open admin menu"
+      >
+        ☰
+      </button>
+
+      <div class="mobile-title">
+        🛡️ TravelMatch Admin
+      </div>
+
+    </header>
+
+
+    <!-- CONTENT -->
+    <main class="admin-content">
+
+      <router-outlet></router-outlet>
+
+    </main>
+
+  </div>
+
+</div>

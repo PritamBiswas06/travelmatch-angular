@@ -1,0 +1,676 @@
+/* =====================================================
+   GLOBAL
+   ===================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   MAIN LAYOUT
+   ===================================================== */
+
+.admin-layout {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #f4f6f9;
+}
+
+
+/* =====================================================
+   SIDEBAR
+   ===================================================== */
+
+.admin-sidebar {
+  width: 250px;
+  height: 100vh;
+
+  background:
+    linear-gradient(
+      180deg,
+      #171426 0%,
+      #1d1a2d 50%,
+      #151322 100%
+    );
+
+  color: white;
+
+  padding: 22px 18px;
+
+  display: flex;
+  flex-direction: column;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  z-index: 1000;
+
+  transition:
+    width 0.28s ease,
+    padding 0.28s ease,
+    transform 0.28s ease,
+    box-shadow 0.28s ease;
+
+  box-shadow:
+    10px 0 35px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =====================================================
+   COLLAPSED
+   ===================================================== */
+
+.admin-sidebar.collapsed {
+  width: 72px;
+  padding: 22px 12px;
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  min-height: 50px;
+
+  margin-bottom: 28px;
+
+  gap: 8px;
+}
+
+
+.brand {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+
+  gap: 11px;
+}
+
+
+.brand-icon {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+  font-size: 19px;
+
+  flex-shrink: 0;
+}
+
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+
+  white-space: nowrap;
+}
+
+
+.brand-text strong {
+  font-size: 17px;
+  line-height: 20px;
+}
+
+
+.brand-text small {
+  margin-top: 2px;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 2px;
+
+  color: #a5b4fc;
+}
+
+
+/* =====================================================
+   TOGGLE
+   ===================================================== */
+
+.toggle-btn {
+  width: 30px;
+  height: 30px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: white;
+
+  cursor: pointer;
+
+  font-size: 17px;
+
+  flex-shrink: 0;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+
+  transform: scale(1.05);
+}
+
+
+/* =====================================================
+   NAVIGATION
+   ===================================================== */
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  min-height: 0;
+
+  overflow-y: auto;
+}
+
+
+.admin-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+
+.admin-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+
+/* =====================================================
+   SECTION TITLE
+   ===================================================== */
+
+.nav-section-title {
+  margin: 0 10px 13px;
+
+  color: #818cf8;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 2px;
+}
+
+
+/* =====================================================
+   NAV LINKS
+   ===================================================== */
+
+.admin-nav a {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  width: 100%;
+
+  min-height: 43px;
+
+  margin-bottom: 6px;
+
+  padding: 9px 11px;
+
+  border-radius: 10px;
+
+  color: #d8d5e6;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.admin-nav a .icon,
+.back-btn .icon {
+  width: 24px;
+
+  text-align: center;
+
+  font-size: 17px;
+
+  flex-shrink: 0;
+}
+
+
+.admin-nav a:hover {
+  color: white;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(124, 58, 237, 0.22),
+      rgba(37, 99, 235, 0.10)
+    );
+
+  transform: translateX(2px);
+}
+
+
+.admin-nav a.active {
+  color: white;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(124, 58, 237, 0.38),
+      rgba(37, 99, 235, 0.18)
+    );
+
+  box-shadow:
+    inset 3px 0 0 #8b5cf6,
+    0 5px 18px rgba(124, 58, 237, 0.10);
+}
+
+
+/* =====================================================
+   COLLAPSED NAV
+   ===================================================== */
+
+.admin-sidebar.collapsed .admin-nav a {
+  justify-content: center;
+
+  padding: 9px 5px;
+}
+
+
+.admin-sidebar.collapsed .nav-section-title {
+  display: none;
+}
+
+
+/* =====================================================
+   DIVIDER
+   ===================================================== */
+
+.nav-divider {
+  height: 1px;
+
+  margin: 12px 2px;
+
+  background: rgba(255, 255, 255, 0.09);
+}
+
+
+/* =====================================================
+   BACK TO TRAVELMATCH
+   ===================================================== */
+
+.back-btn {
+  width: 100%;
+
+  min-height: 43px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 9px 11px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  color: #ddd8eb;
+
+  cursor: pointer;
+
+  font-size: 14px;
+
+  white-space: nowrap;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.13);
+
+  transform: translateX(2px);
+}
+
+
+.admin-sidebar.collapsed .back-btn {
+  justify-content: center;
+
+  padding: 9px 5px;
+}
+
+
+/* =====================================================
+   ADMIN PROFILE
+   ===================================================== */
+
+.admin-profile {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 15px;
+  margin-bottom: 12px;
+
+  padding: 10px;
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.05);
+}
+
+
+.admin-avatar {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+  color: white;
+
+  font-weight: 700;
+}
+
+
+.admin-info {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  white-space: nowrap;
+}
+
+
+.admin-info strong {
+  font-size: 12px;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+.admin-info span {
+  margin-top: 2px;
+
+  color: #9290a3;
+
+  font-size: 10px;
+}
+
+
+.admin-sidebar.collapsed .admin-profile {
+  justify-content: center;
+
+  padding: 8px;
+}
+
+
+/* =====================================================
+   LOGOUT
+   ===================================================== */
+
+.logout {
+  width: 100%;
+
+  min-height: 43px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #ff4b5c;
+
+  color: white;
+
+  cursor: pointer;
+
+  font-size: 14px;
+
+  white-space: nowrap;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.logout:hover {
+  background: #e63946;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 7px 18px rgba(230, 57, 70, 0.25);
+}
+
+
+.admin-sidebar.collapsed .logout {
+  padding: 9px 5px;
+}
+
+
+/* =====================================================
+   MAIN
+   ===================================================== */
+
+.admin-main {
+  flex: 1;
+
+  min-width: 0;
+
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* =====================================================
+   CONTENT
+   ===================================================== */
+
+.admin-content {
+  flex: 1;
+
+  min-width: 0;
+
+  overflow-y: auto;
+
+  background: #f4f6f9;
+}
+
+
+/* =====================================================
+   MOBILE TOPBAR
+   ===================================================== */
+
+.mobile-topbar {
+  display: none;
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+  .admin-sidebar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 250px;
+
+    transform: translateX(-100%);
+
+    padding: 22px 18px;
+  }
+
+
+  .admin-sidebar:not(.collapsed) {
+    transform: translateX(0);
+
+    width: 250px;
+
+    box-shadow:
+      12px 0 35px rgba(0, 0, 0, 0.3);
+  }
+
+
+  .admin-sidebar.collapsed {
+    width: 250px;
+
+    transform: translateX(-100%);
+  }
+
+
+  .sidebar-backdrop {
+    display: block;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    z-index: 900;
+  }
+
+
+  .mobile-topbar {
+    height: 62px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 10px 16px;
+
+    background: #171426;
+
+    color: white;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 500;
+  }
+
+
+  .mobile-menu-btn {
+    width: 40px;
+    height: 40px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: rgba(255, 255, 255, 0.09);
+
+    color: white;
+
+    font-size: 19px;
+
+    cursor: pointer;
+  }
+
+
+  .mobile-title {
+    font-size: 16px;
+
+    font-weight: 700;
+  }
+
+
+  .admin-content {
+    width: 100%;
+  }
+
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+   ===================================================== */
+
+@media (max-width: 480px) {
+
+  .mobile-topbar {
+    height: 58px;
+
+    padding: 9px 13px;
+  }
+
+
+  .mobile-title {
+    font-size: 15px;
+  }
+
+}

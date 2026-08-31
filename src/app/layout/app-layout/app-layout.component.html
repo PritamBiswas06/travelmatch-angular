@@ -1,76 +1,479 @@
 <div class="app-layout">
 
-  <aside class="sidebar" [class.collapsed]="!sidebarOpen" (mouseenter)="onSidebarEnter()" (mouseleave)="onSidebarLeave()">
+
+  <!-- ================================================= -->
+  <!-- SIDEBAR -->
+  <!-- ================================================= -->
+
+  <aside
+    class="sidebar"
+    [class.collapsed]="!sidebarOpen"
+
+    (mouseenter)="onSidebarEnter()"
+    (mouseleave)="onSidebarLeave()"
+  >
+
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR HEADER -->
+    <!-- ================================================= -->
+
     <div class="sidebar-header">
-      <span class="logo" *ngIf="sidebarOpen">✈ TravelMatch</span>
-      <span class="logo-icon" *ngIf="!sidebarOpen">✈</span>
-      <button class="toggle-btn" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+
+      <!-- Expanded -->
+      <span
+        class="logo"
+        *ngIf="sidebarOpen"
+      >
+        ✈ TravelMatch
+      </span>
+
+
+      <!-- Collapsed -->
+      <span
+        class="logo-icon"
+        *ngIf="!sidebarOpen"
+      >
+        ✈
+      </span>
+
+
+      <!-- Toggle -->
+      <button
+        type="button"
+        class="toggle-btn"
+        (click)="toggleSidebar()"
+        aria-label="Toggle sidebar"
+      >
         {{ sidebarOpen ? '‹' : '›' }}
       </button>
+
     </div>
 
-    <nav>
-      <a routerLink="/dashboard" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
-        <span class="icon">🏠</span>
-        <span class="label" *ngIf="sidebarOpen">Dashboard</span>
+
+
+    <!-- ================================================= -->
+    <!-- MAIN NAVIGATION -->
+    <!-- ================================================= -->
+
+    <nav class="main-nav">
+
+
+      <!-- ========================= -->
+      <!-- DASHBOARD -->
+      <!-- ========================= -->
+
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active"
+
+        [routerLinkActiveOptions]="{
+          exact: true
+        }"
+
+        (click)="closeSidebarAfterNavigation()"
+      >
+
+        <span class="icon">
+          🏠
+        </span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Dashboard
+        </span>
+
       </a>
-      <a routerLink="/feed" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
-        <span class="icon">📰</span>
-        <span class="label" *ngIf="sidebarOpen">Feed</span>
+
+
+
+      <!-- ========================= -->
+      <!-- FEED -->
+      <!-- ========================= -->
+
+      <a
+        routerLink="/feed"
+        routerLinkActive="active"
+
+        (click)="closeSidebarAfterNavigation()"
+      >
+
+        <span class="icon">
+          📰
+        </span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Feed
+        </span>
+
       </a>
-      <a *ngIf="myUserId" [routerLink]="['/profile', myUserId]" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
-        <span class="icon">👤</span>
-        <span class="label" *ngIf="sidebarOpen">Profile</span>
+
+
+
+      <!-- ========================= -->
+      <!-- PROFILE -->
+      <!-- ========================= -->
+
+      <a
+        *ngIf="myUserId"
+
+        [routerLink]="[
+          '/profile',
+          myUserId
+        ]"
+
+        routerLinkActive="active"
+
+        (click)="closeSidebarAfterNavigation()"
+      >
+
+        <span class="icon">
+          👤
+        </span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Profile
+        </span>
+
       </a>
-      <a routerLink="/create-plan" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
-        <span class="icon">➕</span>
-        <span class="label" *ngIf="sidebarOpen">Create Plan</span>
+
+
+
+      <!-- ========================= -->
+      <!-- CREATE PLAN -->
+      <!-- ========================= -->
+
+      <a
+        routerLink="/create-plan"
+        routerLinkActive="active"
+
+        (click)="closeSidebarAfterNavigation()"
+      >
+
+        <span class="icon">
+          ➕
+        </span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Create Plan
+        </span>
+
       </a>
-      <a routerLink="/requests" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
-        <span class="icon">📩</span>
-        <span class="label" *ngIf="sidebarOpen">Requests</span>
+
+
+
+      <!-- ========================= -->
+      <!-- REQUESTS -->
+      <!-- ========================= -->
+
+      <a
+        routerLink="/requests"
+        routerLinkActive="active"
+
+        (click)="closeSidebarAfterNavigation()"
+      >
+
+        <span class="icon">
+          📩
+        </span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Requests
+        </span>
+
       </a>
-      <a routerLink="/partners" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
-        <span class="icon">🤝</span>
-        <span class="label" *ngIf="sidebarOpen">Partners</span>
+
+
+
+      <!-- ========================= -->
+      <!-- PARTNERS -->
+      <!-- ========================= -->
+
+      <a
+        routerLink="/partners"
+        routerLinkActive="active"
+
+        (click)="closeSidebarAfterNavigation()"
+      >
+
+        <span class="icon">
+          🤝
+        </span>
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Partners
+        </span>
+
       </a>
-      <a routerLink="/notifications" routerLinkActive="active" (click)="closeSidebarAfterNavigation()">
+
+
+
+      <!-- ================================================= -->
+      <!-- NOTIFICATIONS -->
+      <!-- ================================================= -->
+
+      <a
+        routerLink="/notifications"
+        routerLinkActive="active"
+
+        (click)="closeSidebarAfterNavigation()"
+      >
+
         <span class="icon-wrap">
-          <span class="icon">🔔</span>
-          <span class="badge badge-icon" *ngIf="(unreadCount$ | async) as count">{{ count }}</span>
+
+          <span class="icon">
+            🔔
+          </span>
+
+
+          <span
+            class="badge badge-icon"
+
+            *ngIf="
+              (unreadCount$ | async) as count
+            "
+          >
+            {{ count }}
+          </span>
+
         </span>
-        <span class="label" *ngIf="sidebarOpen">
+
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+
           Notifications
-          <span class="badge badge-inline" *ngIf="(unreadCount$ | async) as count">{{ count }}</span>
+
+
+          <span
+            class="badge badge-inline"
+
+            *ngIf="
+              (unreadCount$ | async) as count
+            "
+          >
+            {{ count }}
+          </span>
+
         </span>
+
       </a>
+
+
     </nav>
 
-    <button class="logout" (click)="logout()">
-      <span class="icon">🚪</span>
-      <span class="label" *ngIf="sidebarOpen">Logout</span>
+
+
+    <!-- ================================================= -->
+    <!-- ADMIN PANEL -->
+    <!-- ONLY ONE ADMIN BUTTON -->
+    <!-- ================================================= -->
+
+    <div
+      class="admin-section"
+      *ngIf="isAdmin"
+    >
+
+
+      <!-- Separator -->
+
+      <div
+        class="admin-separator"
+      ></div>
+
+
+      <!-- Admin Panel -->
+
+      <a
+        routerLink="/admin/dashboard"
+
+        routerLinkActive="active"
+
+        (click)="closeSidebarAfterNavigation()"
+
+        class="admin-nav-item"
+      >
+
+        <span class="icon">
+          🛡️
+        </span>
+
+
+        <span
+          class="label"
+          *ngIf="sidebarOpen"
+        >
+          Admin Panel
+        </span>
+
+      </a>
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- LOGOUT -->
+    <!-- ================================================= -->
+
+    <button
+      type="button"
+
+      class="logout"
+
+      (click)="logout()"
+    >
+
+      <span class="icon">
+        🚪
+      </span>
+
+
+      <span
+        class="label"
+        *ngIf="sidebarOpen"
+      >
+        Logout
+      </span>
+
     </button>
+
+
   </aside>
 
-  <div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="closeSidebarOnBackdrop()"></div>
+
+
+  <!-- ================================================= -->
+  <!-- MOBILE BACKDROP -->
+  <!-- ================================================= -->
+
+  <div
+    class="sidebar-backdrop"
+
+    *ngIf="sidebarOpen"
+
+    (click)="closeSidebarOnBackdrop()"
+  ></div>
+
+
+
+  <!-- ================================================= -->
+  <!-- MAIN WRAPPER -->
+  <!-- ================================================= -->
 
   <div class="main-wrapper">
+
+
+    <!-- ================================================= -->
+    <!-- MOBILE TOPBAR -->
+    <!-- ================================================= -->
+
     <header class="mobile-topbar">
-      <button class="mobile-menu-btn" (click)="toggleSidebar()" aria-label="Open menu">☰</button>
-      <span class="mobile-topbar-title">✈ TravelMatch</span>
-      <a routerLink="/notifications" class="mobile-notif-link" aria-label="Notifications" (click)="closeSidebarAfterNavigation()">
+
+
+      <button
+        type="button"
+
+        class="mobile-menu-btn"
+
+        (click)="toggleSidebar()"
+
+        aria-label="Open menu"
+      >
+        ☰
+      </button>
+
+
+      <span class="mobile-topbar-title">
+        ✈ TravelMatch
+      </span>
+
+
+      <!-- Mobile notifications -->
+
+      <a
+        routerLink="/notifications"
+
+        class="mobile-notif-link"
+
+        aria-label="Notifications"
+
+        (click)="closeSidebarAfterNavigation()"
+      >
+
         🔔
-        <span class="badge badge-icon" *ngIf="(unreadCount$ | async) as count">{{ count }}</span>
+
+
+        <span
+          class="badge badge-icon"
+
+          *ngIf="
+            (unreadCount$ | async) as count
+          "
+        >
+          {{ count }}
+        </span>
+
       </a>
+
     </header>
 
+
+
+    <!-- ================================================= -->
+    <!-- RIGHT SIDE CONTENT -->
+    <!-- ================================================= -->
+
     <main class="content">
+
       <router-outlet></router-outlet>
+
     </main>
+
+
   </div>
 
-  <button class="chatbot-toggle" (click)="toggleChatbot()">💬</button>
 
-  <app-chatbot *ngIf="showChatbot"></app-chatbot>
+
+  <!-- ================================================= -->
+  <!-- CHATBOT -->
+  <!-- ================================================= -->
+
+  <button
+    type="button"
+
+    class="chatbot-toggle"
+
+    (click)="toggleChatbot()"
+
+    aria-label="Open chatbot"
+  >
+    💬
+  </button>
+
+
+  <app-chatbot
+    *ngIf="showChatbot"
+  ></app-chatbot>
+
 
 </div>

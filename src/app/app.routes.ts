@@ -25,64 +25,210 @@ import { AppLayoutComponent } from './layout/app-layout/app-layout.component';
 
 import { authGuard } from './core/auth.guard';
 import { ChatGuard } from './guards/chat.guard';
+
 import { AboutComponent } from './pages/about/about.component';
 
 import { NotificationPanelComponent } from './notifications/notification-panel/notification-panel.component';
 
+import { adminGuard } from './admin/admin.guard';
+
+
 export const routes: Routes = [
 
-  // 🌍 Public Pages
-  { path: '', component: LandingComponent, pathMatch: 'full' },
+  // =====================================================
+  // PUBLIC
+  // =====================================================
 
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
+  {
+    path: '',
+    component: LandingComponent,
+    pathMatch: 'full'
+  },
+
+  {
+    path: 'login',
+    component: LoginComponent
+  },
+
+  {
+    path: 'register',
+    component: RegisterComponent
+  },
+
   {
     path: 'about',
     component: AboutComponent
   },
 
-  // Email verification
-  { path: 'verify-email', component: VerifyEmailComponent },
+  {
+    path: 'verify-email',
+    component: VerifyEmailComponent
+  },
 
-  // 🔑 Forgot password flow
-  { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'verify-reset', component: VerifyResetComponent },
-  { path: 'reset-password', component: ResetPasswordComponent },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent
+  },
 
-  // 🔐 Protected Layout Wrapper
+  {
+    path: 'verify-reset',
+    component: VerifyResetComponent
+  },
+
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent
+  },
+
+
+  // =====================================================
+  // APP LAYOUT
+  // =====================================================
+
   {
     path: '',
     component: AppLayoutComponent,
     canActivate: [authGuard],
+
     children: [
 
-      { path: 'dashboard', component: DashboardComponent },
+      // =========================
+      // NORMAL USER PAGES
+      // =========================
 
-      { path: 'create-plan', component: CreatePlanComponent },
+      {
+        path: 'dashboard',
+        component: DashboardComponent
+      },
 
-      { path: 'matches', component: MatchesComponent },
+      {
+        path: 'create-plan',
+        component: CreatePlanComponent
+      },
 
-      { path: 'feed', component: FeedComponent },
+      {
+        path: 'matches',
+        component: MatchesComponent
+      },
 
-      { path: 'profile/:id', component: UserProfileComponent },
+      {
+        path: 'feed',
+        component: FeedComponent
+      },
 
-      { path: 'requests', component: RequestsComponent },
+      {
+        path: 'profile/:id',
+        component: UserProfileComponent
+      },
 
-      { path: 'partners', component: PartnersComponent },
+      {
+        path: 'requests',
+        component: RequestsComponent
+      },
 
-      { path: 'notifications', component: NotificationPanelComponent },
+      {
+        path: 'partners',
+        component: PartnersComponent
+      },
 
-      // 🔒 Chat protected with extra guard
+      {
+        path: 'notifications',
+        component: NotificationPanelComponent
+      },
+
       {
         path: 'chat/:id',
         component: ChatRoomComponent,
         canActivate: [ChatGuard]
+      },
+
+
+      // =================================================
+      // ADMIN
+      // =================================================
+
+      {
+        path: 'admin',
+        canActivate: [adminGuard],
+
+        children: [
+
+          {
+            path: '',
+            redirectTo: 'dashboard',
+            pathMatch: 'full'
+          },
+
+          {
+            path: 'dashboard',
+            loadComponent: () =>
+              import('./admin/dashboard/admin-dashboard.component')
+                .then(m => m.AdminDashboardComponent)
+          },
+
+          {
+            path: 'users',
+            loadComponent: () =>
+              import('./admin/dashboard/admin-dashboard.component')
+                .then(m => m.AdminDashboardComponent)
+          },
+
+          {
+            path: 'trips',
+            loadComponent: () =>
+              import('./admin/dashboard/admin-dashboard.component')
+                .then(m => m.AdminDashboardComponent)
+          },
+
+          {
+            path: 'reports',
+            loadComponent: () =>
+              import('./admin/dashboard/admin-dashboard.component')
+                .then(m => m.AdminDashboardComponent)
+          },
+
+          {
+            path: 'reviews',
+            loadComponent: () =>
+              import('./admin/dashboard/admin-dashboard.component')
+                .then(m => m.AdminDashboardComponent)
+          },
+
+          {
+            path: 'match-requests',
+            loadComponent: () =>
+              import('./admin/dashboard/admin-dashboard.component')
+                .then(m => m.AdminDashboardComponent)
+          },
+
+          {
+            path: 'partners',
+            loadComponent: () =>
+              import('./admin/dashboard/admin-dashboard.component')
+                .then(m => m.AdminDashboardComponent)
+          },
+
+          {
+            path: 'audit-logs',
+            loadComponent: () =>
+              import('./admin/dashboard/admin-dashboard.component')
+                .then(m => m.AdminDashboardComponent)
+          }
+
+        ]
       }
 
     ]
   },
 
-  // ❌ fallback
-  { path: '**', redirectTo: '' }
+
+  // =====================================================
+  // FALLBACK
+  // =====================================================
+
+  {
+    path: '**',
+    redirectTo: ''
+  }
 
 ];

@@ -1,0 +1,205 @@
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="brand">🛡️ <span>TravelMatch</span></div>
+    <div class="admin-label">ADMIN CONSOLE</div>
+
+    <button [class.active]="section === 'dashboard'" (click)="navigate('dashboard')">📊 <span>Dashboard</span></button>
+    <button [class.active]="section === 'users'" (click)="navigate('users')">👥 <span>Users</span></button>
+    <button [class.active]="section === 'trips'" (click)="navigate('trips')">✈️ <span>Trips</span></button>
+    <button [class.active]="section === 'reports'" (click)="navigate('reports')">🚨 <span>Reports</span></button>
+    <button [class.active]="section === 'reviews'" (click)="navigate('reviews')">⭐ <span>Reviews</span></button>
+    <button [class.active]="section === 'match-requests'" (click)="navigate('match-requests')">🤝 <span>Match Requests</span></button>
+    <button [class.active]="section === 'partners'" (click)="navigate('partners')">🧑‍🤝‍🧑 <span>Partners</span></button>
+    <button [class.active]="section === 'audit-logs'" (click)="navigate('audit-logs')">📝 <span>Audit Logs</span></button>
+
+    <a routerLink="/dashboard" class="back-link">← Back to TravelMatch</a>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <div>
+        <div class="eyebrow">TRAVELMATCH ADMIN</div>
+        <h1>{{ section === 'dashboard' ? 'Platform overview' : (section | titlecase) }}</h1>
+        <p>Manage users, content and safety from one place.</p>
+      </div>
+      <button class="refresh" (click)="loadCurrentSection()">↻ Refresh</button>
+    </header>
+
+    <div *ngIf="loading" class="loading">Loading admin data…</div>
+    <div *ngIf="error" class="alert error">{{ error }}</div>
+    <div *ngIf="success" class="alert success">{{ success }}</div>
+
+    <!-- DASHBOARD -->
+    <section *ngIf="section === 'dashboard' && dashboardData" class="dashboard-grid">
+      <div class="stat"><span>Total Users</span><strong>{{ dashboardData.totalUsers }}</strong><small>Registered accounts</small></div>
+      <div class="stat"><span>Active Users</span><strong>{{ dashboardData.activeUsers }}</strong><small>Currently active</small></div>
+      <div class="stat warning"><span>Suspended</span><strong>{{ dashboardData.suspendedUsers }}</strong><small>Need attention</small></div>
+      <div class="stat"><span>Total Trips</span><strong>{{ dashboardData.totalTrips }}</strong><small>Travel plans</small></div>
+      <div class="stat"><span>Active Trips</span><strong>{{ dashboardData.activeTrips }}</strong><small>Currently visible</small></div>
+      <div class="stat danger"><span>Pending Reports</span><strong>{{ dashboardData.pendingReports }}</strong><small>Moderation queue</small></div>
+      <div class="stat"><span>Total Reviews</span><strong>{{ dashboardData.totalReviews }}</strong><small>Ratings received</small></div>
+      <div class="stat"><span>Match Requests</span><strong>{{ dashboardData.totalMatchRequests }}</strong><small>{{ dashboardData.acceptedMatchRequests }} accepted</small></div>
+      <div class="stat"><span>Travel Partners</span><strong>{{ dashboardData.totalPartners }}</strong><small>Successful connections</small></div>
+
+      <div class="quick-actions">
+        <h2>Moderation shortcuts</h2>
+        <button (click)="navigate('users')">Manage users →</button>
+        <button (click)="navigate('reports')">Review reports →</button>
+        <button (click)="navigate('trips')">Moderate trips →</button>
+        <button (click)="navigate('reviews')">Review ratings →</button>
+      </div>
+    </section>
+
+    <!-- LIST TOOLBAR -->
+    <section *ngIf="section !== 'dashboard'" class="panel">
+      <div class="toolbar" *ngIf="section === 'users' || section === 'trips' || section === 'audit-logs'">
+        <input [(ngModel)]="search" (keyup.enter)="searchNow()" placeholder="Search…" />
+        <button class="primary" (click)="searchNow()">Search</button>
+      </div>
+
+      <div class="toolbar" *ngIf="section === 'reports'">
+        <select [(ngModel)]="reportStatus" (change)="searchNow()">
+          <option value="">All report statuses</option>
+          <option value="PENDING">Pending</option>
+          <option value="REVIEWED">Reviewed</option>
+          <option value="ACTION_TAKEN">Action taken</option>
+          <option value="DISMISSED">Dismissed</option>
+        </select>
+      </div>
+
+      <!-- USERS -->
+      <div *ngIf="section === 'users'" class="table-wrap">
+        <table>
+          <thead><tr><th>User</th><th>Location</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let user of users?.content; trackBy: trackById">
+              <td><strong>{{ user.name }}</strong><small>{{ user.email }}</small></td>
+              <td>{{ user.city || '—' }}</td>
+              <td><span class="badge role">{{ user.role }}</span></td>
+              <td><span class="badge" [class.good]="user.accountStatus === 'ACTIVE'" [class.bad]="user.accountStatus === 'SUSPENDED'">{{ user.accountStatus }}</span></td>
+              <td>{{ user.createdAt | date:'mediumDate' }}</td>
+              <td class="actions">
+                <button *ngIf="user.accountStatus !== 'SUSPENDED'" (click)="changeUserStatus(user,'SUSPENDED')">Suspend</button>
+                <button *ngIf="user.accountStatus === 'SUSPENDED'" (click)="changeUserStatus(user,'ACTIVE')">Reactivate</button>
+                <button *ngIf="user.accountStatus !== 'DEACTIVATED'" (click)="changeUserStatus(user,'DEACTIVATED')">Deactivate</button>
+                <button *ngIf="user.role !== 'ADMIN'" (click)="changeUserRole(user,'ADMIN')">Make admin</button>
+                <button *ngIf="user.role === 'ADMIN'" (click)="changeUserRole(user,'USER')">Make user</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TRIPS -->
+      <div *ngIf="section === 'trips'" class="table-wrap">
+        <table>
+          <thead><tr><th>Trip</th><th>Owner</th><th>Dates</th><th>Budget</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let trip of trips?.content; trackBy: trackById">
+              <td><strong>{{ trip.fromLocation }} → {{ trip.destination }}</strong><small>#{{ trip.id }}</small></td>
+              <td>{{ trip.userName }}<small>{{ trip.userEmail }}</small></td>
+              <td>{{ trip.startDate | date:'mediumDate' }}<br>{{ trip.endDate | date:'mediumDate' }}</td>
+              <td>₹{{ trip.budget | number }}</td>
+              <td>{{ trip.travelType }}</td>
+              <td><span class="badge">{{ trip.status }}</span></td>
+              <td class="actions">
+                <button *ngIf="trip.status !== 'ACTIVE'" (click)="changeTripStatus(trip,'ACTIVE')">Restore</button>
+                <button *ngIf="trip.status === 'ACTIVE'" (click)="changeTripStatus(trip,'REMOVED')">Remove</button>
+                <button (click)="changeTripStatus(trip,'CANCELLED')">Cancel</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- REPORTS -->
+      <div *ngIf="section === 'reports'" class="table-wrap">
+        <table>
+          <thead><tr><th>Report</th><th>Reporter</th><th>Target</th><th>Reason</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let report of reports?.content; trackBy: trackById">
+              <td><strong>#{{ report.id }}</strong><small>{{ report.description || 'No description' }}</small></td>
+              <td>{{ report.reporterName || 'Unknown' }}</td>
+              <td>{{ report.reportedUserName || ('Trip #' + report.reportedTravelPlanId) }}</td>
+              <td>{{ report.reason }}</td>
+              <td><span class="badge" [class.bad]="report.status === 'PENDING'">{{ report.status }}</span></td>
+              <td>{{ report.createdAt | date:'medium' }}</td>
+              <td class="actions">
+                <button (click)="changeReportStatus(report,'REVIEWED')">Review</button>
+                <button (click)="changeReportStatus(report,'ACTION_TAKEN')">Resolve</button>
+                <button (click)="changeReportStatus(report,'DISMISSED')">Dismiss</button>
+                <button (click)="addNote(report)">Note</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- REVIEWS -->
+      <div *ngIf="section === 'reviews'" class="table-wrap">
+        <table>
+          <thead><tr><th>Reviewer</th><th>Recipient</th><th>Rating</th><th>Comment</th><th>Trip</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let review of reviews?.content; trackBy: trackById">
+              <td>{{ review.reviewerName }}</td>
+              <td>{{ review.reviewedUserName }}</td>
+              <td class="rating">★ {{ review.rating }}/5</td>
+              <td class="comment">{{ review.comment || '—' }}</td>
+              <td>#{{ review.travelPlanId }}</td>
+              <td>{{ review.createdAt | date:'mediumDate' }}</td>
+              <td><button class="danger-btn" (click)="removeReview(review)">Remove</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MATCH REQUESTS -->
+      <div *ngIf="section === 'match-requests'" class="table-wrap">
+        <table>
+          <thead><tr><th>Request</th><th>Sender</th><th>Receiver</th><th>Trip</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let item of matchRequests?.content; trackBy: trackById">
+              <td>#{{ item.id }}</td><td>{{ item.senderName }}</td><td>{{ item.receiverName }}</td>
+              <td>{{ item.destination }} (#{{ item.travelPlanId }})</td><td><span class="badge">{{ item.status }}</span></td>
+              <td>{{ item.createdAt | date:'medium' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PARTNERS -->
+      <div *ngIf="section === 'partners'" class="table-wrap">
+        <table>
+          <thead><tr><th>Partner</th><th>Partner</th><th>Trip</th><th>Created</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let item of partners?.content; trackBy: trackById">
+              <td>{{ item.userOneName }}</td><td>{{ item.userTwoName }}</td>
+              <td>{{ item.destination }} (#{{ item.travelPlanId }})</td><td>{{ item.createdAt | date:'medium' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- AUDIT -->
+      <div *ngIf="section === 'audit-logs'" class="table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th>Admin</th><th>Action</th><th>Target</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let item of auditLogs?.content; trackBy: trackById">
+              <td>{{ item.createdAt | date:'medium' }}</td><td>{{ item.adminName }}</td>
+              <td><span class="badge role">{{ item.action }}</span></td><td>{{ item.targetType }} #{{ item.targetId }}</td>
+              <td>{{ item.description }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!loading && currentPageData()?.totalElements === 0" class="empty">No records found.</div>
+
+      <div *ngIf="currentPageData() as data" class="pagination">
+        <span>Page {{ data.number + 1 }} of {{ data.totalPages || 1 }} · {{ data.totalElements }} records</span>
+        <div><button [disabled]="page === 0" (click)="previousPage()">← Previous</button><button [disabled]="page + 1 >= data.totalPages" (click)="nextPage()">Next →</button></div>
+      </div>
+    </section>
+  </main>
+</div>
