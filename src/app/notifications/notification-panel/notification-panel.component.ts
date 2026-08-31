@@ -146,6 +146,22 @@ export class NotificationPanelComponent implements OnInit {
     });
   }
 
+  deleteNotification(event: Event, notification: Notification): void {
+    event.stopPropagation();
+
+    this.notificationService.deleteNotification(notification.id).subscribe({
+      next: () => {
+        this.notifications = this.notifications.filter(n => n.id !== notification.id);
+        this.notificationService.refreshUnreadCount();
+        this.toast.success('Notification deleted');
+      },
+      error: err => {
+        console.error('Failed to delete notification:', err);
+        this.toast.error(err?.error?.message || 'Could not delete notification');
+      }
+    });
+  }
+
   // ==================== NOTIFICATION NAVIGATION ====================
 
   private navigateForNotification(notification: Notification): void {
@@ -184,9 +200,9 @@ export class NotificationPanelComponent implements OnInit {
       return;
     }
 
-    // Post like
-    if (notification.type === 'POST_LIKE') {
-      this.router.navigate(['/feed']);
+    // Post like / comment
+    if (notification.type === 'POST_LIKE' || notification.type === 'TRAVEL_COMMENT') {
+      this.router.navigate(['/feed'], { queryParams: notification.relatedEntityId ? { trip: notification.relatedEntityId } : {} });
       return;
     }
   }

@@ -1,0 +1,41 @@
+<div class="saved-page">
+  <header class="saved-header">
+    <div>
+      <span class="eyebrow">YOUR TRAVEL SPACE</span>
+      <h1>❤️ Saved <span>Trips</span></h1>
+      <p>Keep the travel plans you want to come back to.</p>
+    </div>
+    <a routerLink="/feed" class="back-btn">← Explore Feed</a>
+  </header>
+
+  <div class="state" *ngIf="loading">Loading your saved trips...</div>
+  <div class="state error" *ngIf="!loading && error">{{ error }} <button (click)="load()">Try again</button></div>
+  <div class="state" *ngIf="!loading && !error && trips.length === 0">
+    <div class="big-icon">♡</div>
+    <h2>No saved trips yet</h2>
+    <p>Tap the heart on a travel post to save it here.</p>
+    <a routerLink="/feed" class="primary-btn">Browse Travel Feed</a>
+  </div>
+
+  <div class="trip-grid" *ngIf="!loading && !error && trips.length > 0">
+    <article class="trip-card" *ngFor="let trip of trips">
+      <div class="trip-head">
+        <div>
+          <span class="owner">{{ trip.ownerName }}<span *ngIf="trip.ownerCity"> · {{ trip.ownerCity }}</span></span>
+          <h2>{{ trip.fromLocation }} <span>→</span> {{ trip.destination }}</h2>
+        </div>
+        <span class="saved-heart">♥</span>
+      </div>
+      <div class="trip-meta">
+        <span>📅 {{ trip.startDate | date:'mediumDate' }} – {{ trip.endDate | date:'mediumDate' }}</span>
+        <span>💰 ₹{{ trip.budget | number }}</span>
+        <span>🧳 {{ trip.travelType }}</span>
+        <span class="status">{{ trip.status | titlecase }}</span>
+      </div>
+      <div class="actions">
+        <a class="view-btn" [routerLink]="['/profile', trip.ownerId]">View Traveler</a>
+        <button class="remove-btn" (click)="remove(trip)">Remove</button>
+      </div>
+    </article>
+  </div>
+</div>

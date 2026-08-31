@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import {
   FeedService,
@@ -14,6 +14,8 @@ import { LoaderService } from '../core/loader.service';
 import { LocationImageService } from './location-image.service';
 import { ProfileImageService } from '../core/profile-image.service';
 import { ReportDialogComponent } from '../shared/safety/report-dialog.component';
+import { TravelCommentsComponent } from '../comments/travel-comments.component';
+import { SavedTripsService } from '../saved-trips/saved-trips.service';
 
 type SortOption = 'latest' | 'popular' | 'match';
 
@@ -38,7 +40,7 @@ function emptyFilters(): FeedFilters {
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReportDialogComponent],
+  imports: [CommonModule, FormsModule, ReportDialogComponent, TravelCommentsComponent],
   templateUrl: './feed.component.html',
   styleUrls: ['./feed.component.css']
 })
@@ -72,10 +74,12 @@ export class FeedComponent implements OnInit {
   private matchService: MatchService,
   private loader: LoaderService,
   private router: Router,
+  private route: ActivatedRoute,
 
   public locationImageService: LocationImageService,
 
-  public profileImageService: ProfileImageService
+  public profileImageService: ProfileImageService,
+  private savedTripsService: SavedTripsService
 ) {}
 
   ngOnInit(): void {
@@ -91,6 +95,12 @@ export class FeedComponent implements OnInit {
         this.posts = res || [];
         this.applyFilter();
         this.loading = false;
+
+        const tripId = Number(this.route.snapshot.queryParamMap.get('trip'));
+        if (tripId) {
+          const target = this.posts.find(p => p.id === tripId);
+          if (target) this.selectedPost = target;
+        }
       },
       error: (err) => {
         console.error(err);
@@ -246,6 +256,20 @@ onProfileImageError(
     return this.pendingActionIds.has(
       this.actionKey(planId, action)
     );
+  }
+
+  toggleSaved(post: FeedPost): void {
+    if (post.currentUserSaved) {
+      this.savedTripsService.unsave(post.id).subscribe({
+        next: () => this.mergePost({ ...post, currentUserSaved: false }),
+        error: err => this.showToast(err?.error?.message || 'Could not remove saved trip.')
+      });
+    } else {
+      this.savedTripsService.save(post.id).subscribe({
+        next: () => this.mergePost({ ...post, currentUserSaved: true }),
+        error: err => this.showToast(err?.error?.message || 'Could not save trip.')
+      });
+    }
   }
 
   toggleLike(post: FeedPost): void {

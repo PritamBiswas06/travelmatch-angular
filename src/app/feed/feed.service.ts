@@ -36,6 +36,8 @@ export interface FeedPost {
   shareCount: number;
 
   currentUserReaction: 'LIKE' | 'DISLIKE' | null;
+  currentUserSaved: boolean;
+  commentCount: number;
   matchRequestStatus:
     | 'NONE'
     | 'PENDING'

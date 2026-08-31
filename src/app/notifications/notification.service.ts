@@ -35,6 +35,11 @@ export class NotificationService {
     return this.http.put<Notification>(`${this.baseUrl}/${id}/read`, {});
   }
 
+  // DELETE /api/notifications/{id}
+  deleteNotification(id: number) {
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
+
   // PUT /api/notifications/read-all
   markAllAsRead() {
     return this.http.put(`${this.baseUrl}/read-all`, {});

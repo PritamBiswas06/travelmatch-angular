@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 import { TravelerReview } from '../reviews/traveler-review.service';
+import { TravelMemory } from '../travel-memories/travel-memory.service';
 // import type { TravelerReview } from '../reviews/traveler-review.service';
 
 export interface ProfileTrip {
@@ -15,6 +16,12 @@ export interface ProfileTrip {
   travelType: string;
   status: string;
   matchRequestStatus: 'NONE' | 'PENDING' | 'ACCEPTED' | 'REJECTED' | null;
+  createdAt: string | null;
+  likeCount: number;
+  shareCount: number;
+  commentCount: number;
+  currentUserReaction: 'LIKE' | 'DISLIKE' | null;
+  currentUserSaved: boolean;
 }
 
 export interface UserProfile {
@@ -47,6 +54,8 @@ export interface UserProfile {
 
   isOwnProfile: boolean;
   upcomingTrips: ProfileTrip[];
+  posts: ProfileTrip[];
+  travelMemories: TravelMemory[];
 
   averageRating: number;
   reviewCount: number;
@@ -88,6 +97,14 @@ export class ProfileService {
 
   deleteTravelPlan(planId: number): Observable<void> {
     return this.http.delete<void>(`${API_BASE_URL}/travel/${planId}`);
+  }
+
+  likeTravelPlan(planId: number): Observable<any> {
+    return this.http.post(`${API_BASE_URL}/travel/${planId}/like`, {});
+  }
+
+  dislikeTravelPlan(planId: number): Observable<any> {
+    return this.http.post(`${API_BASE_URL}/travel/${planId}/dislike`, {});
   }
 
   updateMyProfile(data: UpdateProfileRequest): Observable<UserProfile> {

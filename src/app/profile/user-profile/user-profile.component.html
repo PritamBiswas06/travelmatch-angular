@@ -449,6 +449,118 @@
       </div>
 
       <!-- ================================================= -->
+      <!-- TRAVEL POSTS / SOCIAL TIMELINE -->
+      <!-- ================================================= -->
+
+      <section class="profile-posts-section">
+        <div class="section-heading-row">
+          <div>
+            <span class="section-eyebrow">TRAVEL TIMELINE</span>
+            <h2>{{ profile.isOwnProfile ? 'Your Travel Posts' : profile.name + "'s Travel Posts" }}</h2>
+          </div>
+          <span class="post-count">{{ profile.posts.length }} {{ profile.posts.length === 1 ? 'post' : 'posts' }}</span>
+        </div>
+
+        <div class="no-trips" *ngIf="profile.posts.length === 0">
+          <div class="state-icon small">✈️</div>
+          <h3>No travel posts yet</h3>
+          <p>{{ profile.isOwnProfile ? 'Create a travel plan and it will appear here.' : 'This traveler has not shared a travel plan yet.' }}</p>
+        </div>
+
+        <div class="profile-posts-list" *ngIf="profile.posts.length > 0">
+          <article class="profile-post-card" *ngFor="let post of profile.posts; trackBy: trackByTripId">
+            <div class="profile-post-top">
+              <div class="profile-post-author">
+                <img class="profile-post-avatar" [src]="getProfileImage()" [alt]="profile.name + ' profile photo'" (error)="onProfileImageError($event)" />
+                <div>
+                  <strong>{{ profile.name }}</strong>
+                  <span *ngIf="post.createdAt">{{ post.createdAt | date:'medium' }}</span>
+                </div>
+              </div>
+              <span class="post-status">{{ post.status | titlecase }}</span>
+            </div>
+
+            <div class="profile-post-route">
+              <div><small>FROM</small><strong>{{ post.fromLocation }}</strong></div>
+              <span>✈️</span>
+              <div class="route-destination"><small>TO</small><strong>{{ post.destination }}</strong></div>
+            </div>
+
+            <div class="profile-post-meta">
+              <span>📅 {{ post.startDate | date:'mediumDate' }}<span *ngIf="post.endDate"> – {{ post.endDate | date:'mediumDate' }}</span></span>
+              <span>💰 ₹{{ post.budget | number }}</span>
+              <span>🧳 {{ post.travelType }}</span>
+            </div>
+
+            <div class="profile-post-actions">
+              <button type="button" class="post-action" [class.liked]="post.currentUserReaction === 'LIKE'" (click)="toggleTripLike(post)">❤️ {{ post.likeCount }}</button>
+              <button type="button" class="post-action" [class.saved]="post.currentUserSaved" (click)="toggleSavedTrip(post)">{{ post.currentUserSaved ? '♥ Saved' : '♡ Save' }}</button>
+              <button type="button" class="post-action" (click)="openTrip(post)">View Details</button>
+              <button type="button" class="post-action danger" *ngIf="profile.isOwnProfile" (click)="deleteTrip(post)">Delete</button>
+            </div>
+
+            <app-travel-comments [travelPlanId]="post.id" [initialCount]="post.commentCount" (countChange)="post.commentCount = $event"></app-travel-comments>
+          </article>
+        </div>
+      </section>
+
+      <!-- ================================================= -->
+      <!-- TRAVEL MEMORIES -->
+      <!-- ================================================= -->
+
+      <section class="profile-memories-section">
+        <div class="section-heading-row">
+          <div>
+            <span class="section-eyebrow">AFTER THE JOURNEY</span>
+            <h2>Travel Memories</h2>
+          </div>
+          <button type="button" class="memory-add-btn" *ngIf="profile.isOwnProfile" (click)="openMemoryForm()">
+            {{ showMemoryForm ? 'Close' : '+ Add Memory' }}
+          </button>
+        </div>
+
+        <div class="memory-form" *ngIf="showMemoryForm && profile.isOwnProfile">
+          <h3>Share a completed-trip memory</h3>
+          <label>Completed Trip
+            <select [(ngModel)]="selectedMemoryTripId">
+              <option [ngValue]="null">Select a completed trip</option>
+              <option *ngFor="let trip of profile.posts" [ngValue]="trip.id" [disabled]="trip.status.toUpperCase() !== 'COMPLETED'">
+                {{ trip.fromLocation }} → {{ trip.destination }}
+              </option>
+            </select>
+          </label>
+          <label>Caption
+            <textarea [(ngModel)]="memoryCaption" maxlength="500" rows="3" placeholder="Tell people about the journey..."></textarea>
+          </label>
+          <label>Photo
+            <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onMemoryFileSelected($event)" />
+          </label>
+          <p class="memory-error" *ngIf="memoryError">{{ memoryError }}</p>
+          <button type="button" class="primary-btn" [disabled]="memoryBusy || !selectedMemoryTripId || !memoryFile" (click)="createMemory()">
+            {{ memoryBusy ? 'Uploading...' : 'Publish Memory' }}
+          </button>
+        </div>
+
+        <div class="memories-grid" *ngIf="profile.travelMemories.length > 0">
+          <article class="memory-card" *ngFor="let memory of profile.travelMemories">
+            <img *ngIf="memory.photoUrl" [src]="memory.photoUrl" [alt]="memory.destination + ' travel memory'" loading="lazy" />
+            <div class="memory-content">
+              <span>📍 {{ memory.destination }}</span>
+              <p *ngIf="memory.caption">{{ memory.caption }}</p>
+              <small>{{ memory.createdAt | date:'mediumDate' }}</small>
+              <button type="button" class="memory-delete" *ngIf="profile.isOwnProfile" (click)="deleteMemory(memory)">🗑 Delete</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="no-trips" *ngIf="profile.travelMemories.length === 0 && !showMemoryForm">
+          <div class="state-icon small">📸</div>
+          <h3>No memories yet</h3>
+          <p>{{ profile.isOwnProfile ? 'After a trip is completed, share your favorite moment here.' : 'This traveler has not shared any travel memories yet.' }}</p>
+        </div>
+      </section>
+
+      <!-- ================================================= -->
       <!-- REVIEWS -->
       <!-- ================================================= -->
 

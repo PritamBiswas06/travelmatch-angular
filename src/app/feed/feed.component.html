@@ -321,6 +321,18 @@
           </button>
         </div>
 
+        <!-- COMMENTS / SAVE -->
+        <div class="post-phase3-actions">
+          <button type="button" class="reaction-btn" [class.saved]="post.currentUserSaved" (click)="toggleSaved(post)">
+            {{ post.currentUserSaved ? '♥ Saved' : '♡ Save' }}
+          </button>
+          <app-travel-comments
+            [travelPlanId]="post.id"
+            [initialCount]="post.commentCount"
+            (countChange)="post.commentCount = $event">
+          </app-travel-comments>
+        </div>
+
         <!-- ACTIONS -->
         <div class="actions-row">
           <button class="secondary-btn" (click)="viewProfile(post)">

@@ -23,6 +23,20 @@ import {
 
 import { ReportDialogComponent } from '../../shared/safety/report-dialog.component';
 import { ReviewDialogComponent } from '../../reviews/review-dialog/review-dialog.component';
+import { TravelCommentsComponent } from '../../comments/travel-comments.component';
+import { SavedTripsService } from '../../saved-trips/saved-trips.service';
+import { TravelMemoryService, TravelMemory } from '../../travel-memories/travel-memory.service';
+
+/**
+ * UserProfile from profile.service.ts does not currently declare `posts`,
+ * but the profile API can return a posts array.
+ *
+ * Keeping the extension here fixes the Angular template type error while
+ * preserving the existing UserProfile model used by the rest of the app.
+ */
+type ProfileWithPosts = UserProfile & {
+  posts: ProfileTrip[];
+};
 
 interface EditModel {
   name: string;
@@ -49,7 +63,8 @@ interface EditModel {
     FormsModule,
     RouterLink,
     ReportDialogComponent,
-    ReviewDialogComponent
+    ReviewDialogComponent,
+    TravelCommentsComponent
   ],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css']
@@ -121,13 +136,20 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   userId!: number;
 
-  profile: UserProfile | null = null;
+  profile: ProfileWithPosts | null = null;
 
   loading = true;
   error = false;
   notFound = false;
 
   selectedTrip: ProfileTrip | null = null;
+
+  // Phase 3: travel memories
+  memoryCaption = '';
+  memoryFile: File | null = null;
+  memoryBusy = false;
+  memoryError = '';
+  showMemoryForm = false;
 
   isEditing = false;
   savingProfile = false;
@@ -185,7 +207,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private modalService: ModalService,
     private profileImageService: ProfileImageService,
     private safetyService: SafetyService,
-    private travelerReviewService: TravelerReviewService
+    private travelerReviewService: TravelerReviewService,
+    private savedTripsService: SavedTripsService,
+    private travelMemoryService: TravelMemoryService
   ) {}
 
   // ==================== INIT ====================
@@ -217,6 +241,30 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   // ==================== LOAD PROFILE ====================
 
+  /**
+   * Converts the ProfileService response into the profile type used by this
+   * component. Older/partial API responses may not contain `posts`, so we
+   * always provide a safe array.
+   *
+   * `fallbackPosts` is used after profile edits/photo changes so we do not
+   * accidentally wipe posts when those endpoints return only profile data.
+   */
+  private normalizeProfile(
+    res: UserProfile,
+    fallbackPosts: ProfileTrip[] = []
+  ): ProfileWithPosts {
+    const response = res as UserProfile & {
+      posts?: ProfileTrip[];
+    };
+
+    return {
+      ...res,
+      posts: Array.isArray(response.posts)
+        ? response.posts
+        : fallbackPosts
+    } as ProfileWithPosts;
+  }
+
   loadProfile(): void {
 
     this.loading = true;
@@ -228,7 +276,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
       next: (res) => {
 
-        this.profile = res;
+        this.profile = this.normalizeProfile(res);
         this.loading = false;
 
         this.isBlocked = false;
@@ -625,7 +673,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
               upcomingTrips:
                 this.profile.upcomingTrips.filter(
                   t => t.id !== trip.id
-                )
+                ),
+              posts: this.profile.posts.filter(t => t.id !== trip.id)
             };
           }
 
@@ -793,12 +842,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         this.profile.upcomingTrips.map(
           trip =>
             trip.id === tripId
-              ? {
-                  ...trip,
-                  matchRequestStatus: status
-                }
+              ? { ...trip, matchRequestStatus: status }
               : trip
-        )
+        ),
+      posts: this.profile.posts.map(
+        trip => trip.id === tripId
+          ? { ...trip, matchRequestStatus: status }
+          : trip
+      )
     };
 
     if (
@@ -834,6 +885,103 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       default:
         return 'Send Match Request';
     }
+  }
+
+  toggleTripLike(trip: ProfileTrip): void {
+    const request = trip.currentUserReaction === 'LIKE'
+      ? this.profileService.likeTravelPlan(trip.id)
+      : this.profileService.likeTravelPlan(trip.id);
+    request.subscribe({
+      next: (updated: any) => {
+        if (!this.profile) return;
+        const replacement = (t: ProfileTrip): ProfileTrip => t.id === trip.id
+          ? { ...t, likeCount: updated.likeCount, currentUserReaction: updated.currentUserReaction }
+          : t;
+        this.profile = { ...this.profile, posts: this.profile.posts.map(replacement), upcomingTrips: this.profile.upcomingTrips.map(replacement) };
+      },
+      error: err => this.showToast(err?.error?.message || 'Could not update like.')
+    });
+  }
+
+  // ==================== PHASE 3: SAVED TRIPS ====================
+
+  toggleSavedTrip(trip: ProfileTrip): void {
+    if (!this.profile) return;
+
+    if (trip.currentUserSaved) {
+      this.savedTripsService.unsave(trip.id).subscribe({
+        next: () => { this.setTripSavedState(trip.id, false); this.showToast('Removed from saved trips.'); },
+        error: err => this.showToast(err?.error?.message || 'Could not remove saved trip.')
+      });
+    } else {
+      this.savedTripsService.save(trip.id).subscribe({
+        next: () => { this.setTripSavedState(trip.id, true); this.showToast('Trip saved.'); },
+        error: err => this.showToast(err?.error?.message || 'Could not save trip.')
+      });
+    }
+  }
+
+  private setTripSavedState(tripId: number, saved: boolean): void {
+    if (!this.profile) return;
+    const update = (trip: ProfileTrip) => trip.id === tripId ? { ...trip, currentUserSaved: saved } : trip;
+    this.profile = {
+      ...this.profile,
+      posts: this.profile.posts.map(update),
+      upcomingTrips: this.profile.upcomingTrips.map(update)
+    };
+    if (this.selectedTrip?.id === tripId) this.selectedTrip = update(this.selectedTrip);
+  }
+
+  // ==================== PHASE 3: TRAVEL MEMORIES ====================
+
+  onMemoryFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.memoryFile = input.files?.[0] || null;
+    this.memoryError = '';
+  }
+
+  createMemory(): void {
+    if (!this.profile?.isOwnProfile || !this.memoryFile || this.memoryBusy) return;
+    const completedTrip = this.profile.posts.find(t => t.id === this.selectedMemoryTripId);
+    if (!completedTrip || completedTrip.status?.toUpperCase() !== 'COMPLETED') {
+      this.memoryError = 'Select a completed trip.';
+      return;
+    }
+    this.memoryBusy = true;
+    this.memoryError = '';
+    this.travelMemoryService.create(completedTrip.id, this.memoryCaption, this.memoryFile).subscribe({
+      next: memory => {
+        this.profile = this.profile ? { ...this.profile, travelMemories: [memory, ...this.profile.travelMemories] } : this.profile;
+        this.memoryCaption = '';
+        this.memoryFile = null;
+        this.selectedMemoryTripId = null;
+        this.showMemoryForm = false;
+        this.memoryBusy = false;
+        this.showToast('Travel memory added.');
+      },
+      error: err => {
+        this.memoryBusy = false;
+        this.memoryError = err?.error?.message || 'Could not create memory.';
+      }
+    });
+  }
+
+  selectedMemoryTripId: number | null = null;
+
+  deleteMemory(memory: TravelMemory): void {
+    if (!this.profile?.isOwnProfile) return;
+    this.travelMemoryService.delete(memory.id).subscribe({
+      next: () => {
+        if (this.profile) this.profile = { ...this.profile, travelMemories: this.profile.travelMemories.filter(m => m.id !== memory.id) };
+        this.showToast('Travel memory deleted.');
+      },
+      error: err => this.showToast(err?.error?.message || 'Could not delete memory.')
+    });
+  }
+
+  openMemoryForm(): void {
+    this.showMemoryForm = !this.showMemoryForm;
+    if (!this.showMemoryForm) { this.selectedMemoryTripId = null; this.memoryFile = null; this.memoryCaption = ''; }
   }
 
   // ==================== EDIT PROFILE ====================
@@ -1095,7 +1243,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
         next: res => {
 
-          this.profile = res;
+          this.profile = this.normalizeProfile(res, this.profile?.posts ?? []);
 
           this.isEditing = false;
           this.savingProfile = false;
@@ -1237,7 +1385,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
         next: res => {
 
-          this.profile = res;
+          this.profile = this.normalizeProfile(res, this.profile?.posts ?? []);
 
           this.uploadingPhoto = false;
 
@@ -1298,7 +1446,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
         next: res => {
 
-          this.profile = res;
+          this.profile = this.normalizeProfile(res, this.profile?.posts ?? []);
 
           this.uploadingPhoto = false;
 

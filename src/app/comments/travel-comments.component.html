@@ -1,0 +1,137 @@
+<div class="comments-widget">
+
+  <!-- Comments Toggle -->
+  <button
+    type="button"
+    class="comments-toggle"
+    (click)="toggle()"
+  >
+    💬
+    {{ initialCount }}
+    {{ initialCount === 1 ? 'Comment' : 'Comments' }}
+  </button>
+
+
+  <!-- Comments Panel -->
+  <div
+    class="comments-panel"
+    *ngIf="open"
+  >
+
+    <!-- Loading -->
+    <div
+      class="comments-loading"
+      *ngIf="loading"
+    >
+      Loading comments...
+    </div>
+
+
+    <!-- Empty -->
+    <div
+      class="comments-empty"
+      *ngIf="!loading && comments.length === 0"
+    >
+      No comments yet. Be the first to say something.
+    </div>
+
+
+    <!-- Comments List -->
+    <div
+      class="comment-list"
+      *ngIf="!loading && comments.length > 0"
+    >
+
+      <div
+        class="comment-item"
+        *ngFor="let comment of comments"
+      >
+
+        <!-- Avatar -->
+        <div class="comment-avatar">
+          {{ comment.userName.charAt(0) || '?' }}
+        </div>
+
+
+        <!-- Comment Body -->
+        <div class="comment-body">
+
+          <div class="comment-head">
+
+            <strong>
+              {{ comment.userName }}
+            </strong>
+
+            <span>
+              {{ comment.createdAt | date:'medium' }}
+            </span>
+
+          </div>
+
+
+          <p>
+            {{ comment.comment }}
+          </p>
+
+        </div>
+
+
+        <!-- Delete Own Comment -->
+        <button
+          *ngIf="comment.ownComment"
+          type="button"
+          class="comment-delete"
+          title="Delete comment"
+          aria-label="Delete comment"
+          (click)="deleteComment(comment)"
+        >
+          🗑️
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- Comment Form -->
+    <div class="comment-form">
+
+      <textarea
+        [(ngModel)]="commentText"
+        maxlength="500"
+        rows="2"
+        placeholder="Write a comment..."
+      ></textarea>
+
+
+      <div class="comment-form-bottom">
+
+        <span>
+          {{ commentText.length }}/500
+        </span>
+
+
+        <button
+          type="button"
+          [disabled]="!commentText.trim() || submitting"
+          (click)="addComment()"
+        >
+          {{ submitting ? 'Posting...' : 'Comment' }}
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- Error -->
+    <p
+      class="comment-error"
+      *ngIf="error"
+    >
+      {{ error }}
+    </p>
+
+  </div>
+
+</div>

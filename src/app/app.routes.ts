@@ -137,6 +137,13 @@ export const routes: Routes = [
       },
 
       {
+        path: 'saved-trips',
+        loadComponent: () =>
+          import('./saved-trips/saved-trips.component')
+            .then(m => m.SavedTripsComponent)
+      },
+
+      {
         path: 'chat/:id',
         component: ChatRoomComponent,
         canActivate: [ChatGuard]
