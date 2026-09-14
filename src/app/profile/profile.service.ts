@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
-import { TravelerReview } from '../reviews/traveler-review.service';
+import { DataCacheService } from '../core/data-cache.service';
+import { tap } from 'rxjs';
 import { TravelMemory } from '../travel-memories/travel-memory.service';
+import { TravelerReview } from '../reviews/traveler-review.service';
 // import type { TravelerReview } from '../reviews/traveler-review.service';
 
 export interface ProfileTrip {
@@ -90,26 +92,26 @@ export interface UpdateProfileRequest {
 export class ProfileService {
   private baseUrl = `${API_BASE_URL}/users`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cache: DataCacheService) {}
 
   getProfile(userId: number): Observable<UserProfile> {
-    return this.http.get<UserProfile>(`${this.baseUrl}/${userId}/profile`);
+    return this.cache.get(`profile:${userId}`, () => this.http.get<UserProfile>(`${this.baseUrl}/${userId}/profile`));
   }
 
   deleteTravelPlan(planId: number): Observable<void> {
-    return this.http.delete<void>(`${API_BASE_URL}/travel/${planId}`);
+    return this.http.delete<void>(`${API_BASE_URL}/travel/${planId}`).pipe(tap(() => { this.cache.invalidatePrefix('profile:'); this.cache.invalidate('travel:my'); this.cache.invalidatePrefix('feed:'); }));
   }
 
   likeTravelPlan(planId: number): Observable<any> {
-    return this.http.post(`${API_BASE_URL}/travel/${planId}/like`, {});
+    return this.http.post(`${API_BASE_URL}/travel/${planId}/like`, {}).pipe(tap(() => this.cache.invalidatePrefix('profile:')));
   }
 
   dislikeTravelPlan(planId: number): Observable<any> {
-    return this.http.post(`${API_BASE_URL}/travel/${planId}/dislike`, {});
+    return this.http.post(`${API_BASE_URL}/travel/${planId}/dislike`, {}).pipe(tap(() => this.cache.invalidatePrefix('profile:')));
   }
 
   updateMyProfile(data: UpdateProfileRequest): Observable<UserProfile> {
-    return this.http.put<UserProfile>(`${this.baseUrl}/me/profile`, data);
+    return this.http.put<UserProfile>(`${this.baseUrl}/me/profile`, data).pipe(tap(() => this.cache.invalidatePrefix('profile:')));
   }
 
   uploadProfilePhoto(file: File): Observable<UserProfile> {
@@ -120,10 +122,10 @@ export class ProfileService {
     return this.http.post<UserProfile>(
       `${this.baseUrl}/me/profile/photo`,
       formData,
-    );
+    ).pipe(tap(() => this.cache.invalidatePrefix('profile:')));
   }
 
   removeProfilePhoto(): Observable<UserProfile> {
-    return this.http.delete<UserProfile>(`${this.baseUrl}/me/profile/photo`);
+    return this.http.delete<UserProfile>(`${this.baseUrl}/me/profile/photo`).pipe(tap(() => this.cache.invalidatePrefix('profile:')));
   }
 }

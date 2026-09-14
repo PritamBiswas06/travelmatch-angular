@@ -1,42 +1,45 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { tap } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
+import { DataCacheService } from '../core/data-cache.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class MatchService {
+  private baseUrl = `${API_BASE_URL}/match`;
 
-  private baseUrl= `${API_BASE_URL}/match`;
+  constructor(private http: HttpClient, private cache: DataCacheService) {}
 
-  constructor(private http: HttpClient) {}
-
-  // Send Match Request
   sendMatchRequest(travelPlanId: number) {
-    return this.http.post(
-      `${this.baseUrl}/send/${travelPlanId}`,
-      {}
+    return this.http.post(`${this.baseUrl}/send/${travelPlanId}`, {}).pipe(
+      tap(() => {
+        this.invalidateMatchData();
+        this.cache.invalidatePrefix('feed:');
+        this.cache.invalidatePrefix('travel:matches:');
+      })
     );
   }
 
-  // Get My Incoming Requests
   getMyRequests() {
-    return this.http.get(`${this.baseUrl}/my`);
+    return this.cache.get('match:my', () => this.http.get(`${this.baseUrl}/my`));
   }
 
-  // Accept Request
   acceptRequest(requestId: number) {
-    return this.http.put(
-      `${this.baseUrl}/${requestId}/accept`,
-      {}
+    return this.http.put(`${this.baseUrl}/${requestId}/accept`, {}).pipe(
+      tap(() => this.invalidateMatchData())
     );
   }
 
-  // Reject Request
   rejectRequest(requestId: number) {
-    return this.http.put(
-      `${this.baseUrl}/${requestId}/reject`,
-      {}
+    return this.http.put(`${this.baseUrl}/${requestId}/reject`, {}).pipe(
+      tap(() => this.invalidateMatchData())
     );
+  }
+
+  private invalidateMatchData(): void {
+    this.cache.invalidate('match:my');
+    this.cache.invalidate('partner:my');
+    this.cache.invalidate('notification:list');
+    this.cache.invalidate('notification:unread');
   }
 }

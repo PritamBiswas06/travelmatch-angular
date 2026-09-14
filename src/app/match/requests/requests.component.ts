@@ -15,6 +15,7 @@ import { ToastService } from '../../shared/toast/toast.service';
 export class RequestsComponent implements OnInit {
 
   requests: any[] = [];
+  loading = true;
 
   constructor(private matchService: MatchService,
     private router: Router,
@@ -29,10 +30,13 @@ export class RequestsComponent implements OnInit {
   loadRequests() {
     this.matchService.getMyRequests().subscribe({
       next: (res: any) => {
-        this.requests = res;
+        this.requests = Array.isArray(res) ? res : [];
+        this.loading = false;
       },
       error: (err) => {
         console.error(err);
+        this.requests = [];
+        this.loading = false;
       }
     });
   }
@@ -60,6 +64,9 @@ accept(id: number) {
     next: (res: any) => {
       this.loader.hide();
 
+      const accepted = this.requests.find(r => r.id === id);
+      if (accepted) accepted.status = 'ACCEPTED';
+
       // alert('Request Accepted!');
 
       // 🔥 OPTION 1 — Go to Partners page
@@ -81,8 +88,9 @@ accept(id: number) {
     this.matchService.rejectRequest(id).subscribe({
       next: () => {
         this.loader.hide();
+        const rejected = this.requests.find(r => r.id === id);
+        if (rejected) rejected.status = 'REJECTED';
         this.toast.success('Request Rejected!');
-        this.loadRequests();
       },
       error: () => {
         this.loader.hide();

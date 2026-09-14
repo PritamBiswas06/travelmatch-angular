@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { TravelService } from '../travel.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Notification } from '../../notifications/notification.model';
+import { TravelService } from '../travel.service';
 import { MatchService } from '../../match/match.service';
 import { PartnerService } from '../../partner/partner.service';
 import { NotificationService } from '../../notifications/notification.service';
-import { Notification } from '../../notifications/notification.model';
 
 @Component({
   selector: 'app-dashboard',

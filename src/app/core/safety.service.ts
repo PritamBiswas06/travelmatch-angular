@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
+import { DataCacheService } from './data-cache.service';
 
 import { API_BASE_URL } from '../config/api.config';
 
@@ -25,35 +26,29 @@ export class SafetyService {
   private readonly baseUrl = API_BASE_URL;
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private cache: DataCacheService
   ) {}
 
   blockUser(
     userId: number
   ): Observable<{ message: string }> {
 
-    return this.http.post<{ message: string }>(
-      `${this.baseUrl}/users/${userId}/block`,
-      {}
-    );
+    return this.http.post<{ message: string }>(`${this.baseUrl}/users/${userId}/block`, {}).pipe(tap(() => this.cache.invalidate(`blocked:${userId}`)));
   }
 
   unblockUser(
     userId: number
   ): Observable<{ message: string }> {
 
-    return this.http.delete<{ message: string }>(
-      `${this.baseUrl}/users/${userId}/block`
-    );
+    return this.http.delete<{ message: string }>(`${this.baseUrl}/users/${userId}/block`).pipe(tap(() => this.cache.invalidate(`blocked:${userId}`)));
   }
 
   isBlocked(
     userId: number
   ): Observable<{ blocked: boolean }> {
 
-    return this.http.get<{ blocked: boolean }>(
-      `${this.baseUrl}/users/${userId}/block`
-    );
+    return this.cache.get(`blocked:${userId}`, () => this.http.get<{ blocked: boolean }>(`${this.baseUrl}/users/${userId}/block`));
   }
 
   reportUser(

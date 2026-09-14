@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
+import { DataCacheService } from '../core/data-cache.service';
 import { API_BASE_URL } from '../config/api.config';
 
 export interface CompatibilityFactor {
@@ -66,7 +67,7 @@ export class FeedService {
 
   private baseUrl = `${API_BASE_URL}/travel`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cache: DataCacheService) {}
 
   getFeed(
     sort: 'latest' | 'popular' | 'match' = 'latest',
@@ -137,30 +138,22 @@ export class FeedService {
       for(const key of keys){const v=filters[key];if(v!==undefined&&v!==null&&v!=='')params=params.set(key as string,String(v));}
     }
 
-    return this.http.get<FeedPost[]>(
+    const key = `feed:${sort}:${params.toString()}`;
+    return this.cache.get(key, () => this.http.get<FeedPost[]>(
       `${this.baseUrl}/feed`,
       { params }
-    );
+    ));
   }
 
   like(planId: number): Observable<FeedPost> {
-    return this.http.post<FeedPost>(
-      `${this.baseUrl}/${planId}/like`,
-      {}
-    );
+    return this.http.post<FeedPost>(`${this.baseUrl}/${planId}/like`, {}).pipe(tap(() => this.cache.invalidatePrefix('feed:')));
   }
 
   dislike(planId: number): Observable<FeedPost> {
-    return this.http.post<FeedPost>(
-      `${this.baseUrl}/${planId}/dislike`,
-      {}
-    );
+    return this.http.post<FeedPost>(`${this.baseUrl}/${planId}/dislike`, {}).pipe(tap(() => this.cache.invalidatePrefix('feed:')));
   }
 
   share(planId: number): Observable<FeedPost> {
-    return this.http.post<FeedPost>(
-      `${this.baseUrl}/${planId}/share`,
-      {}
-    );
+    return this.http.post<FeedPost>(`${this.baseUrl}/${planId}/share`, {}).pipe(tap(() => this.cache.invalidatePrefix('feed:')));
   }
 }

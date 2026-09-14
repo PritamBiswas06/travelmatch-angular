@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { API_BASE_URL } from '../config/api.config';
+import { DataCacheService } from '../core/data-cache.service';
 import { Observable } from 'rxjs';
 
 export interface PageResponse<T> {
@@ -119,10 +120,10 @@ export interface AdminAuditLog {
 export class AdminService {
   private readonly baseUrl = `${API_BASE_URL}/admin`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cache: DataCacheService) {}
 
   dashboard(): Observable<AdminDashboard> {
-    return this.http.get<AdminDashboard>(`${this.baseUrl}/dashboard`);
+    return this.cache.get('admin:dashboard', () => this.http.get<AdminDashboard>(`${this.baseUrl}/dashboard`));
   }
 
   users(page = 0, size = 20, search = ''): Observable<PageResponse<AdminUser>> {
