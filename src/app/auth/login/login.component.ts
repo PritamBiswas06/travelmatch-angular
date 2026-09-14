@@ -74,10 +74,8 @@ export class LoginComponent implements OnInit {
         // // Navigate to dashboard
         // this.router.navigate(['/dashboard']);
 
-        setTimeout(() => {
-          this.loader.hide();
-          this.router.navigate(['/dashboard']);
-        }, 500);
+        this.loader.hide();
+        this.router.navigate(['/dashboard']);
       },
 
       error: (err) => {

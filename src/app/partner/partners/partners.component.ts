@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PartnerService } from '../partner.service';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { LoaderService } from '../../core/loader.service'; // 👈 add
+import { LoaderService } from '../../core/loader.service';
 
 @Component({
   selector: 'app-partners',
@@ -19,21 +19,17 @@ export class PartnersComponent implements OnInit {
   constructor(
     private partnerService: PartnerService,
     private router: Router,
-    private loader: LoaderService   // 👈 inject loader
+    private loader: LoaderService
   ) {}
 
   ngOnInit(): void {
 
-    // 🔵 Show loader while fetching partners
-    this.loader.show("Loading your travel partners...");
-
     this.partnerService.getMyPartners().subscribe({
       next: (res: any) => {
         this.partners = res;
-        this.loader.hide(); // hide loader
       },
       error: () => {
-        this.loader.hide();
+        // Global HTTP interceptor handles the loader lifecycle.
       }
     });
   }
@@ -54,7 +50,7 @@ export class PartnersComponent implements OnInit {
    */
   openChat(partner: any) {
 
-    // 🔵 Show loader
+    // Show loader while opening chat
     this.loader.show("Connecting to partner...");
 
     let otherUserId;
@@ -68,7 +64,7 @@ export class PartnersComponent implements OnInit {
     setTimeout(() => {
       this.loader.hide();
       this.router.navigate(['/chat', otherUserId]);
-    }, 700); // small delay for smooth animation
+    }, 700);
   }
 
 }

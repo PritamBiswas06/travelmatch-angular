@@ -84,6 +84,15 @@ export class AppComponent
    */
   private navigationLoading = false;
 
+  /*
+   * Routes that have already been visited in this browser session.
+   *
+   * The HTTP interceptor still shows the loader for real API calls.
+   * This set only prevents the navigation itself from showing the
+   * full-screen loader again when returning to an already-loaded route.
+   */
+  private readonly visitedRoutes = new Set<string>();
+
 
   constructor(
 
@@ -122,16 +131,25 @@ export class AppComponent
         if (event instanceof NavigationStart) {
 
           /*
-           * Prevent duplicate navigation loader calls.
+           * Only the first visit to a route gets a navigation loader.
+           *
+           * Returning to an already visited route should normally be
+           * served by the in-memory DataCacheService without another
+           * HTTP request, so showing the full-screen loader here would
+           * defeat the purpose of the cache.
            */
-          if (!this.navigationLoading) {
+          const routeKey = event.url;
 
+          if (
+            !this.visitedRoutes.has(routeKey) &&
+            !this.navigationLoading
+          ) {
+            this.visitedRoutes.add(routeKey);
             this.navigationLoading = true;
 
             this.loaderService.show(
               'Loading page...'
             );
-
           }
 
           return;
