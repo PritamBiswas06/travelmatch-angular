@@ -38,6 +38,7 @@ export class AdminDashboardComponent implements OnInit {
   matchRequests: PageResponse<AdminMatchRequest> | null = null;
   partners: PageResponse<AdminPartner> | null = null;
   auditLogs: PageResponse<AdminAuditLog> | null = null;
+  monetizationMetrics: any = null;
 
   loading = false;
 
@@ -58,6 +59,7 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCurrentSection();
+    this.admin.monetizationMetrics().subscribe({ next: value => this.monetizationMetrics = value, error: (e: unknown) => console.error(e) });
   }
 
   // ============================================================

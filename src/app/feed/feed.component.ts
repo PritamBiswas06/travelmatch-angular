@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import {
   FeedService,
@@ -16,6 +16,7 @@ import { ProfileImageService } from '../core/profile-image.service';
 import { ReportDialogComponent } from '../shared/safety/report-dialog.component';
 import { TravelCommentsComponent } from '../comments/travel-comments.component';
 import { SavedTripsService } from '../saved-trips/saved-trips.service';
+import { PremiumService } from '../premium/premium.service';
 
 type SortOption = 'latest' | 'popular' | 'match';
 
@@ -40,7 +41,7 @@ function emptyFilters(): FeedFilters {
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReportDialogComponent, TravelCommentsComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ReportDialogComponent, TravelCommentsComponent],
   templateUrl: './feed.component.html',
   styleUrls: ['./feed.component.css']
 })
@@ -68,6 +69,8 @@ export class FeedComponent implements OnInit {
   private toastTimeout: any;
 
   pendingActionIds = new Set<string>();
+  premium=false;
+  advancedFilters={minAge:null as number|null,maxAge:null as number|null,travelStyle:'',travelInterest:'',language:'',country:'',city:''};
 
   constructor(
   private feedService: FeedService,
@@ -79,10 +82,11 @@ export class FeedComponent implements OnInit {
   public locationImageService: LocationImageService,
 
   public profileImageService: ProfileImageService,
-  private savedTripsService: SavedTripsService
+  private savedTripsService: SavedTripsService, private premiumService: PremiumService
 ) {}
 
   ngOnInit(): void {
+    this.premiumService.status().subscribe({next:s=>this.premium=s.premium});
     this.loadFeed();
   }
 
@@ -143,7 +147,7 @@ export class FeedComponent implements OnInit {
   }
 
   applyFilters(): void {
-    this.appliedFilters = { ...this.filters };
+    this.appliedFilters = { ...this.filters, ...(this.premium ? this.advancedFilters : {}) };
     this.showFilterPanel = false;
     this.loadFeed();
   }

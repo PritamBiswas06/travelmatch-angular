@@ -31,6 +31,7 @@ import { AboutComponent } from './pages/about/about.component';
 import { NotificationPanelComponent } from './notifications/notification-panel/notification-panel.component';
 
 import { adminGuard } from './admin/admin.guard';
+import { PremiumComponent } from './premium/premium.component';
 
 
 export const routes: Routes = [
@@ -135,6 +136,8 @@ export const routes: Routes = [
         path: 'notifications',
         component: NotificationPanelComponent
       },
+
+      { path: 'premium', component: PremiumComponent },
 
       {
         path: 'saved-trips',

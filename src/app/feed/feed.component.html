@@ -128,6 +128,17 @@
       </label>
     </div>
 
+    <div class="premium-filters" *ngIf="premium">
+      <label>Min Age <input type="number" [(ngModel)]="advancedFilters.minAge" min="18"></label>
+      <label>Max Age <input type="number" [(ngModel)]="advancedFilters.maxAge" min="18"></label>
+      <label>Travel Style <input type="text" [(ngModel)]="advancedFilters.travelStyle" placeholder="Backpacking"></label>
+      <label>Interest <input type="text" [(ngModel)]="advancedFilters.travelInterest" placeholder="Photography"></label>
+      <label>Language <input type="text" [(ngModel)]="advancedFilters.language" placeholder="Hindi"></label>
+      <label>Country <input type="text" [(ngModel)]="advancedFilters.country" placeholder="India"></label>
+      <label>City <input type="text" [(ngModel)]="advancedFilters.city" placeholder="Kolkata"></label>
+    </div>
+    <div class="premium-note" *ngIf="!premium">Advanced filters are available with <a routerLink="/premium">Premium</a>.</div>
+
     <div class="filter-actions">
       <button type="button" class="secondary-btn" (click)="clearFilters()">
         Clear Filters
@@ -235,7 +246,7 @@
               (error)="onProfileImageError($event, post)"
             />
             <div class="user-meta">
-              <span class="user-name">{{ post.userName }}</span>
+              <span class="user-name">{{ post.userName }} <small class="premium-badge" *ngIf="post.premiumUser">PREMIUM</small></span>
               <span class="user-city" *ngIf="post.userCity">{{
                 post.userCity
               }}</span>
@@ -256,6 +267,7 @@
           </div>
         </div>
 
+        <span class="boost-badge" *ngIf="post.boosted">BOOSTED</span>
         <div class="match-score" *ngIf="post.matchScore !== null">
           🔥 {{ post.matchScore }}% Travel Compatibility
           <button

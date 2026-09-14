@@ -106,6 +106,8 @@
             {{ profile.name }}
           </h1>
 
+          <span class="premium-profile-badge" *ngIf="profile.premiumUser">PREMIUM</span>
+
           <span
             class="verified-badge"
             *ngIf="profile.verified"
@@ -496,6 +498,7 @@
               <button type="button" class="post-action" [class.liked]="post.currentUserReaction === 'LIKE'" (click)="toggleTripLike(post)">❤️ {{ post.likeCount }}</button>
               <button type="button" class="post-action" [class.saved]="post.currentUserSaved" (click)="toggleSavedTrip(post)">{{ post.currentUserSaved ? '♥ Saved' : '♡ Save' }}</button>
               <button type="button" class="post-action" (click)="openTrip(post)">View Details</button>
+              <button type="button" class="post-action" *ngIf="profile.isOwnProfile" (click)="boostTrip(post)">Boost 24h</button>
               <button type="button" class="post-action danger" *ngIf="profile.isOwnProfile" (click)="deleteTrip(post)">Delete</button>
             </div>
 

@@ -26,17 +26,7 @@ import { ReviewDialogComponent } from '../../reviews/review-dialog/review-dialog
 import { TravelCommentsComponent } from '../../comments/travel-comments.component';
 import { SavedTripsService } from '../../saved-trips/saved-trips.service';
 import { TravelMemoryService, TravelMemory } from '../../travel-memories/travel-memory.service';
-
-/**
- * UserProfile from profile.service.ts does not currently declare `posts`,
- * but the profile API can return a posts array.
- *
- * Keeping the extension here fixes the Angular template type error while
- * preserving the existing UserProfile model used by the rest of the app.
- */
-type ProfileWithPosts = UserProfile & {
-  posts: ProfileTrip[];
-};
+import { PremiumService } from '../../premium/premium.service';
 
 interface EditModel {
   name: string;
@@ -136,7 +126,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   userId!: number;
 
-  profile: ProfileWithPosts | null = null;
+  profile: UserProfile | null = null;
 
   loading = true;
   error = false;
@@ -209,7 +199,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private safetyService: SafetyService,
     private travelerReviewService: TravelerReviewService,
     private savedTripsService: SavedTripsService,
-    private travelMemoryService: TravelMemoryService
+    private travelMemoryService: TravelMemoryService,
+    private premiumService: PremiumService
   ) {}
 
   // ==================== INIT ====================
@@ -241,30 +232,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   // ==================== LOAD PROFILE ====================
 
-  /**
-   * Converts the ProfileService response into the profile type used by this
-   * component. Older/partial API responses may not contain `posts`, so we
-   * always provide a safe array.
-   *
-   * `fallbackPosts` is used after profile edits/photo changes so we do not
-   * accidentally wipe posts when those endpoints return only profile data.
-   */
-  private normalizeProfile(
-    res: UserProfile,
-    fallbackPosts: ProfileTrip[] = []
-  ): ProfileWithPosts {
-    const response = res as UserProfile & {
-      posts?: ProfileTrip[];
-    };
-
-    return {
-      ...res,
-      posts: Array.isArray(response.posts)
-        ? response.posts
-        : fallbackPosts
-    } as ProfileWithPosts;
-  }
-
   loadProfile(): void {
 
     this.loading = true;
@@ -276,7 +243,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
       next: (res) => {
 
-        this.profile = this.normalizeProfile(res);
+        this.profile = res;
         this.loading = false;
 
         this.isBlocked = false;
@@ -903,6 +870,46 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
   }
 
+  boostTrip(trip: ProfileTrip): void {
+    this.premiumService.createBoostOrder(trip.id).subscribe({
+      next: order => {
+        if (!(window as any).Razorpay) {
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.onload = () => this.openBoostCheckout(order);
+          script.onerror = () => this.showToast('Razorpay could not be loaded.');
+          document.body.appendChild(script);
+        } else {
+          this.openBoostCheckout(order);
+        }
+      },
+      error: err => this.showToast(err?.error?.message || 'Could not create boost payment.')
+    });
+  }
+
+  private openBoostCheckout(order: any): void {
+    const RazorpayCtor = (window as any).Razorpay;
+    const checkout = new RazorpayCtor({
+      key: order.keyId,
+      amount: order.amount,
+      currency: order.currency,
+      name: 'TravelMatch',
+      description: '24-hour boosted travel post',
+      order_id: order.orderId,
+      handler: (response: any) => {
+        this.premiumService.verifyBoost(order.referenceId, {
+          orderId: response.razorpay_order_id,
+          paymentId: response.razorpay_payment_id,
+          signature: response.razorpay_signature
+        }).subscribe({
+          next: () => this.showToast('Your trip is boosted for 24 hours.'),
+          error: err => this.showToast(err?.error?.message || 'Boost verification failed.')
+        });
+      }
+    });
+    checkout.open();
+  }
+
   // ==================== PHASE 3: SAVED TRIPS ====================
 
   toggleSavedTrip(trip: ProfileTrip): void {
@@ -1243,7 +1250,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
         next: res => {
 
-          this.profile = this.normalizeProfile(res, this.profile?.posts ?? []);
+          this.profile = res;
 
           this.isEditing = false;
           this.savingProfile = false;
@@ -1385,7 +1392,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
         next: res => {
 
-          this.profile = this.normalizeProfile(res, this.profile?.posts ?? []);
+          this.profile = res;
 
           this.uploadingPhoto = false;
 
@@ -1446,7 +1453,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
         next: res => {
 
-          this.profile = this.normalizeProfile(res, this.profile?.posts ?? []);
+          this.profile = res;
 
           this.uploadingPhoto = false;
 

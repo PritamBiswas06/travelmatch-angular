@@ -38,6 +38,8 @@ export interface FeedPost {
   currentUserReaction: 'LIKE' | 'DISLIKE' | null;
   currentUserSaved: boolean;
   commentCount: number;
+  premiumUser: boolean; boosted: boolean; boostMultiplier: number | null;
+
   matchRequestStatus:
     | 'NONE'
     | 'PENDING'
@@ -54,6 +56,7 @@ export interface FeedFilters {
   endDate?: string | null;
   travelType?: string;
   minMatchScore?: number | null;
+  minAge?: number | null; maxAge?: number | null; travelStyle?: string; travelInterest?: string; language?: string; country?: string; city?: string;
 }
 
 @Injectable({
@@ -130,6 +133,8 @@ export class FeedService {
           filters.minMatchScore
         );
       }
+      const keys: (keyof FeedFilters)[]=['minAge','maxAge','travelStyle','travelInterest','language','country','city'];
+      for(const key of keys){const v=filters[key];if(v!==undefined&&v!==null&&v!=='')params=params.set(key as string,String(v));}
     }
 
     return this.http.get<FeedPost[]>(

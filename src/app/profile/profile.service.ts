@@ -53,6 +53,7 @@ export interface UserProfile {
   websiteUrl: string | null;
 
   isOwnProfile: boolean;
+  premiumUser: boolean;
   upcomingTrips: ProfileTrip[];
   posts: ProfileTrip[];
   travelMemories: TravelMemory[];

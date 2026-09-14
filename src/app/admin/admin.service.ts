@@ -24,6 +24,7 @@ export interface AdminDashboard {
   totalMatchRequests: number;
   acceptedMatchRequests: number;
   totalPartners: number;
+  premiumUsers: number; activeSubscriptions: number; totalPayments: number; successfulPayments: number; failedPayments: number; totalBoosts: number; activeBoosts: number; revenuePaise: number;
 }
 
 export interface AdminUser {
@@ -185,6 +186,10 @@ export class AdminService {
       params: this.pageParams(page, size)
     });
   }
+
+  monetizationMetrics(): Observable<any> { return this.http.get<any>(`${this.baseUrl}/monetization/metrics`); }
+
+  monetizationPayments(page = 0, size = 20): Observable<PageResponse<any>> { return this.http.get<PageResponse<any>>(`${this.baseUrl}/monetization/payments`, { params: this.pageParams(page, size) }); }
 
   auditLogs(page = 0, size = 20, search = ''): Observable<PageResponse<AdminAuditLog>> {
     return this.http.get<PageResponse<AdminAuditLog>>(`${this.baseUrl}/audit-logs`, {

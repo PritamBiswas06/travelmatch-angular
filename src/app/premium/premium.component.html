@@ -1,0 +1,264 @@
+<div class="premium-page">
+
+  <!-- ==================== HERO ==================== -->
+
+  <section class="hero">
+    <div>
+      <span>TRAVELMATCH PREMIUM</span>
+
+      <h1>Travel further with Premium.</h1>
+
+      <p>
+        More discovery, more connections and priority visibility.
+      </p>
+    </div>
+
+    <strong *ngIf="status">
+      ₹{{ status.price / 100 | number: "1.0-0" }}
+      <small>/ 30 days</small>
+    </strong>
+  </section>
+
+
+  <!-- ==================== MESSAGES ==================== -->
+
+  <div
+    class="msg error"
+    *ngIf="error"
+  >
+    {{ error }}
+  </div>
+
+  <div
+    class="msg success"
+    *ngIf="success"
+  >
+    {{ success }}
+  </div>
+
+
+  <!-- ==================== BENEFITS ==================== -->
+
+  <section class="benefits">
+
+    <article>
+      <b>Who viewed me</b>
+      <p>See recent profile visitors.</p>
+    </article>
+
+    <article>
+      <b>Unlimited requests</b>
+      <p>No 30-day request cap.</p>
+    </article>
+
+    <article>
+      <b>Priority feed</b>
+      <p>Your posts receive ranking priority.</p>
+    </article>
+
+    <article>
+      <b>Advanced filters</b>
+      <p>
+        Age, style, interests, languages and location.
+      </p>
+    </article>
+
+    <article>
+      <b>Premium badge</b>
+      <p>Show Premium across TravelMatch.</p>
+    </article>
+
+  </section>
+
+
+  <!-- ==================== PROFILE VIEWS ==================== -->
+
+  <section
+    class="views"
+    *ngIf="status?.premium"
+  >
+
+    <div class="views-head">
+
+      <div>
+        <h2>Who viewed me</h2>
+
+        <p>
+          See recent visitors to your profile.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="loadViews()"
+      >
+        {{ showViews ? "Hide visitors" : "View visitors" }}
+      </button>
+
+    </div>
+
+
+    <div
+      class="view-list"
+      *ngIf="showViews"
+    >
+
+      <div
+        class="view-item"
+        *ngFor="let v of views"
+      >
+
+        <img
+          *ngIf="v.profilePhotoUrl"
+          [src]="v.profilePhotoUrl"
+          [alt]="v.name || 'Traveler'"
+        />
+
+        <div
+          class="view-avatar"
+          *ngIf="!v.profilePhotoUrl"
+        >
+          {{ v.name?.charAt(0) || "T" }}
+        </div>
+
+        <div>
+
+          <strong>
+            {{ v.name }}
+          </strong>
+
+          <span>
+            {{ v.city || "Traveler" }}
+            ·
+            {{ v.viewedAt | date: "medium" }}
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <p *ngIf="views.length === 0">
+        No profile views yet.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- ==================== TRAVEL TOOLS ==================== -->
+
+  <section
+    class="travel-tools"
+    *ngIf="status?.affiliateEnabled"
+  >
+
+    <h2>Travel essentials</h2>
+
+    <p>
+      Helpful travel services. Some links may earn
+      TravelMatch a commission.
+    </p>
+
+    <div>
+
+      <a
+        *ngIf="status?.flightPartnerUrl"
+        [href]="status?.flightPartnerUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Flights
+      </a>
+
+      <a
+        *ngIf="status?.hotelPartnerUrl"
+        [href]="status?.hotelPartnerUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Hotels
+      </a>
+
+      <a
+        *ngIf="status?.insuranceUrl"
+        [href]="status?.insuranceUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Travel Insurance
+      </a>
+
+    </div>
+
+  </section>
+
+
+  <!-- ==================== PREMIUM ACTION ==================== -->
+
+  <section
+    class="action"
+    *ngIf="!loading"
+  >
+
+    <ng-container
+      *ngIf="!status?.premium; else active"
+    >
+
+      <h2>
+        Upgrade your account
+      </h2>
+
+      <p>
+        Secure Razorpay payment activates
+        30 days of Premium.
+      </p>
+
+      <button
+        type="button"
+        (click)="subscribe()"
+        [disabled]="paying"
+      >
+        {{
+          paying
+            ? "Opening payment..."
+            : "Get Premium"
+        }}
+      </button>
+
+    </ng-container>
+
+
+    <!-- ==================== ACTIVE PREMIUM ==================== -->
+
+    <ng-template #active>
+
+      <h2>
+        Premium is active
+      </h2>
+
+      <p>
+        Your Premium access is currently active.
+      </p>
+
+      <button
+        type="button"
+        class="cancel"
+        (click)="cancel()"
+      >
+        Cancel Premium
+      </button>
+
+    </ng-template>
+
+  </section>
+
+
+  <!-- ==================== BACK ==================== -->
+
+  <a routerLink="/dashboard">
+    ← Back to TravelMatch
+  </a>
+
+</div>
