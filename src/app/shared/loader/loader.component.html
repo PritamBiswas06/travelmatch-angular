@@ -1,14 +1,59 @@
-<div class="loader-overlay" *ngIf="loading">
+<div
+  class="loader-overlay"
+  *ngIf="loading"
+  role="status"
+  aria-live="polite"
+  aria-busy="true"
+>
 
   <div class="globe-loader">
 
-    <div class="orbit">
-      <div class="plane">✈</div>
+
+    <!-- OUTER ROTATING RING -->
+
+    <div class="loader-ring loader-ring-one"></div>
+
+
+    <!-- SECOND ROTATING RING -->
+
+    <div class="loader-ring loader-ring-two"></div>
+
+
+    <!-- EARTH -->
+
+    <div class="earth-wrap">
+
+      <div class="earth"></div>
+
     </div>
 
-    <div class="earth"></div>
 
-    <p class="loading-text">{{message || 'Loading...'}}</p>
+    <!-- AIRPLANE -->
+
+    <div
+      class="plane"
+      aria-hidden="true"
+    >
+      ✈
+    </div>
+
+
+    <!-- MAIN MESSAGE -->
+
+    <p class="loading-text">
+
+      {{ message || 'Loading...' }}
+
+    </p>
+
+
+    <!-- SECONDARY MESSAGE -->
+
+    <span class="loading-subtext">
+
+      Please wait
+
+    </span>
 
   </div>
 

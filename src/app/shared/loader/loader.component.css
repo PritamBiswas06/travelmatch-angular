@@ -1,86 +1,335 @@
-/* FULLSCREEN OVERLAY */
+/* =========================================================
+   GLOBAL LOADING OVERLAY
+   ========================================================= */
 
-.loader-overlay{
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,#020617,#000814);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
+.loader-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 99999;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  /*
+   * Slightly transparent instead of a completely black screen.
+   * This makes the loader feel like part of the application
+   * rather than a separate page.
+   */
+
+  background: rgba(248, 250, 252, 0.88);
+
+  backdrop-filter: blur(7px);
+
+  -webkit-backdrop-filter: blur(7px);
+
 }
 
-/* MAIN CONTAINER */
 
-.globe-loader{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+/* =========================================================
+   LOADER CONTAINER
+   ========================================================= */
+
+.globe-loader {
+
+  position: relative;
+
+  width: 230px;
+
+  min-height: 250px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
 }
 
-/* EARTH */
 
-.earth{
-  width:150px;
-  height:150px;
-  border-radius:50%;
+/* =========================================================
+   EARTH
+   ========================================================= */
 
-  background:
-  url("https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif")
-  center/cover;
+.earth-wrap {
+
+  position: relative;
+
+  z-index: 3;
+
+  width: 92px;
+
+  height: 92px;
+
+  border-radius: 50%;
+
+  overflow: hidden;
 
   box-shadow:
-  inset -40px -40px 60px rgba(0,0,0,0.7),
-  inset 15px 15px 30px rgba(255,255,255,0.3),
-  0 0 40px rgba(0,180,255,0.7);
+    0 16px 45px rgba(15, 23, 42, 0.20);
 
-  position:relative;
-  z-index:2;
 }
 
-/* ORBIT */
 
-.orbit{
-  position:absolute;
+.earth {
 
-  width:220px;
-  height:220px;
+  width: 100%;
 
-  border-radius:50%;
-  border:1px dashed rgba(255,255,255,0.3);
+  height: 100%;
 
-  display:flex;
-  justify-content:center;
+  border-radius: 50%;
 
-  animation:orbitRotate 4s linear infinite;
+  background:
+
+    url("https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif")
+
+    center / cover no-repeat;
+
+  animation:
+    earthPulse 1.8s ease-in-out infinite;
+
 }
 
-/* PLANE */
 
-.plane{
-  position:absolute;
-  top:-14px;
+/* =========================================================
+   OUTER RINGS
+   ========================================================= */
 
-  font-size:28px;
-  color:#ff7a18;
+.loader-ring {
 
-  text-shadow:
-  0 0 10px rgba(255,122,24,0.8),
-  0 0 20px rgba(255,122,24,0.5);
+  position: absolute;
+
+  top: 50%;
+
+  left: 50%;
+
+  border-radius: 50%;
+
+  border:
+    1px solid rgba(79, 70, 229, 0.22);
+
+  transform:
+    translate(-50%, -50%);
+
 }
 
-/* ANIMATION */
 
-@keyframes orbitRotate{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
+/* First ring */
+
+.loader-ring-one {
+
+  width: 140px;
+
+  height: 140px;
+
+  animation:
+    ringPulse 1.8s ease-in-out infinite;
+
 }
 
-/* TEXT */
 
-.loading-text{
-  margin-top:75px;
-  color:#e2e8f0;
-  font-size:15px;
-  letter-spacing:0.5px;
+/* Second ring */
+
+.loader-ring-two {
+
+  width: 178px;
+
+  height: 178px;
+
+  border-style: dashed;
+
+  animation:
+    ringRotate 5s linear infinite;
+
+}
+
+
+/* =========================================================
+   AIRPLANE
+   ========================================================= */
+
+.plane {
+
+  position: absolute;
+
+  top: 34px;
+
+  right: 27px;
+
+  z-index: 4;
+
+  font-size: 22px;
+
+  transform-origin: center;
+
+  animation:
+    planeOrbit 2.8s linear infinite;
+
+}
+
+
+/* =========================================================
+   LOADING TEXT
+   ========================================================= */
+
+.loading-text {
+
+  margin:
+
+    34px 0 3px;
+
+  color: #172033;
+
+  font-size: 15px;
+
+  font-weight: 800;
+
+  letter-spacing: .2px;
+
+  text-align: center;
+
+}
+
+
+/* =========================================================
+   SECONDARY TEXT
+   ========================================================= */
+
+.loading-subtext {
+
+  color: #7a8599;
+
+  font-size: 12px;
+
+}
+
+
+/* =========================================================
+   EARTH ANIMATION
+   ========================================================= */
+
+@keyframes earthPulse {
+
+  0%,
+  100% {
+
+    transform:
+      scale(1);
+
+  }
+
+  50% {
+
+    transform:
+      scale(1.035);
+
+  }
+
+}
+
+
+/* =========================================================
+   RING PULSE
+   ========================================================= */
+
+@keyframes ringPulse {
+
+  0%,
+  100% {
+
+    opacity: .35;
+
+    transform:
+      translate(-50%, -50%)
+      scale(.95);
+
+  }
+
+  50% {
+
+    opacity: .9;
+
+    transform:
+      translate(-50%, -50%)
+      scale(1.04);
+
+  }
+
+}
+
+
+/* =========================================================
+   RING ROTATION
+   ========================================================= */
+
+@keyframes ringRotate {
+
+  from {
+
+    transform:
+      translate(-50%, -50%)
+      rotate(0deg);
+
+  }
+
+  to {
+
+    transform:
+      translate(-50%, -50%)
+      rotate(360deg);
+
+  }
+
+}
+
+
+/* =========================================================
+   AIRPLANE ORBIT
+   ========================================================= */
+
+@keyframes planeOrbit {
+
+  from {
+
+    transform:
+      rotate(0deg)
+      translateX(74px)
+      rotate(0deg);
+
+  }
+
+  to {
+
+    transform:
+      rotate(360deg)
+      translateX(74px)
+      rotate(-360deg);
+
+  }
+
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .earth,
+  .loader-ring-one,
+  .loader-ring-two,
+  .plane {
+
+    animation: none;
+
+  }
+
 }
