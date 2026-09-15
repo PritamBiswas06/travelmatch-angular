@@ -10,23 +10,6 @@ import { LoaderService } from './loader.service';
  *
  * Every Angular HttpClient request automatically activates
  * the TravelMatch global loader.
- *
- * This prevents pages from displaying misleading empty states
- * while Railway is still returning the API response.
- *
- * Example:
- *
- * GET /api/match/my
- *
- * Instead of:
- *
- * "Your inbox is quiet"
- *
- * appearing for 3 seconds, the user sees:
- *
- * "Loading..."
- *
- * until the API request actually finishes.
  */
 export const loadingInterceptor: HttpInterceptorFn =
   (req, next) => {
@@ -36,7 +19,8 @@ export const loadingInterceptor: HttpInterceptorFn =
     /*
      * Start loading before the request is sent.
      */
-    loader.beginHttp('Loading...');
+    const loadingToken =
+      loader.beginHttp('Loading...');
 
 
     return next(req).pipe(
@@ -47,13 +31,10 @@ export const loadingInterceptor: HttpInterceptorFn =
        * - successful response
        * - HTTP error
        * - request cancellation
-       *
-       * Therefore the loader cannot remain stuck because
-       * of a normal HTTP failure.
        */
       finalize(() => {
 
-        loader.endHttp();
+        loader.endHttp(loadingToken);
 
       })
 

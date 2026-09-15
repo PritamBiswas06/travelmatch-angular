@@ -1,37 +1,33 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
+type LoaderToken = number;
+
 @Injectable({
   providedIn: 'root'
 })
 export class LoaderService {
 
   /*
-   * There are two types of loading operations:
+   * The loader has two independent sources:
    *
-   * 1. manualRequests
-   *    Used by existing code such as:
-   *    - Sending request
-   *    - Creating plan
-   *    - Login
-   *    - Uploading photo
+   * - manual operations: explicit actions such as creating a plan,
+   *   sending a request, login, etc.
+   * - HTTP operations: every real HttpClient request, tracked by the
+   *   loading interceptor.
    *
-   * 2. httpRequests
-   *    Automatically controlled by loading.interceptor.ts.
-   *
-   * Both are reference counted.
-   *
-   * This is important because the application can have multiple API calls
-   * running at the same time.
+   * Tokens are used instead of only counters. This makes cleanup
+   * idempotent and, importantly, prevents an old request that finishes
+   * after reset() from decrementing a newer session's loader state.
    */
+  private nextToken = 0;
+  private readonly manualRequests = new Set<LoaderToken>();
+  private readonly httpRequests = new Set<LoaderToken>();
 
-  private manualRequests = 0;
-  private httpRequests = 0;
-
-  private loadingSubject =
+  private readonly loadingSubject =
     new BehaviorSubject<boolean>(false);
 
-  private messageSubject =
+  private readonly messageSubject =
     new BehaviorSubject<string>('Loading...');
 
   readonly loading$ =
@@ -45,20 +41,26 @@ export class LoaderService {
   // MANUAL LOADING
   // =========================================================
 
-  show(message: string = 'Loading...'): void {
+  show(message: string = 'Loading...'): LoaderToken {
+    const token = ++this.nextToken;
 
-    this.manualRequests++;
-
+    this.manualRequests.add(token);
     this.messageSubject.next(message);
-
     this.publishState();
+
+    return token;
   }
 
 
-  hide(): void {
+  hide(token?: LoaderToken): void {
+    if (token !== undefined) {
+      this.manualRequests.delete(token);
+    } else {
+      const first = this.manualRequests.values().next();
 
-    if (this.manualRequests > 0) {
-      this.manualRequests--;
+      if (!first.done) {
+        this.manualRequests.delete(first.value);
+      }
     }
 
     this.publishState();
@@ -69,40 +71,34 @@ export class LoaderService {
   // HTTP LOADING
   // =========================================================
 
-  /**
-   * Called automatically by the HTTP interceptor whenever
-   * an HttpClient request starts.
-   */
-  beginHttp(message: string = 'Loading...'): void {
+  beginHttp(message: string = 'Loading...'): LoaderToken {
+    const token = ++this.nextToken;
 
-    this.httpRequests++;
+    this.httpRequests.add(token);
 
     /*
-     * Don't replace a more specific message such as:
-     *
-     * "Creating Plan..."
-     * "Sending travel request..."
-     *
-     * with the generic HTTP message.
+     * A specific manual operation message has priority while that
+     * operation is active.
      */
-    if (this.manualRequests === 0) {
+    if (this.manualRequests.size === 0) {
       this.messageSubject.next(message);
     }
 
     this.publishState();
+
+    return token;
   }
 
 
-  /**
-   * Called automatically when an HttpClient request finishes.
-   *
-   * finalize() in the interceptor guarantees this is called
-   * for both successful and failed requests.
-   */
-  endHttp(): void {
+  endHttp(token?: LoaderToken): void {
+    if (token !== undefined) {
+      this.httpRequests.delete(token);
+    } else {
+      const first = this.httpRequests.values().next();
 
-    if (this.httpRequests > 0) {
-      this.httpRequests--;
+      if (!first.done) {
+        this.httpRequests.delete(first.value);
+      }
     }
 
     this.publishState();
@@ -114,19 +110,17 @@ export class LoaderService {
   // =========================================================
 
   /**
-   * Emergency reset.
+   * Clears all currently tracked operations.
    *
-   * Useful if the application ever needs to force the loader
-   * back to a clean state.
+   * Existing finalize() callbacks can still run after a reset, but their
+   * tokens no longer exist in the sets, so they cannot affect a newer
+   * session's loader state.
    */
   reset(): void {
-
-    this.manualRequests = 0;
-
-    this.httpRequests = 0;
+    this.manualRequests.clear();
+    this.httpRequests.clear();
 
     this.messageSubject.next('Loading...');
-
     this.publishState();
   }
 
@@ -136,11 +130,9 @@ export class LoaderService {
   // =========================================================
 
   private publishState(): void {
-
-    const shouldShow =
-      this.manualRequests > 0 ||
-      this.httpRequests > 0;
-
-    this.loadingSubject.next(shouldShow);
+    this.loadingSubject.next(
+      this.manualRequests.size > 0 ||
+      this.httpRequests.size > 0
+    );
   }
 }
