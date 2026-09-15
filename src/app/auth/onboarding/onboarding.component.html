@@ -1,0 +1,91 @@
+<div class="onboarding-page">
+  <div class="onboarding-glow glow-one"></div>
+  <div class="onboarding-glow glow-two"></div>
+
+  <main class="onboarding-card" aria-live="polite">
+    <div class="brand">
+      <span class="brand-mark">✈</span>
+      <span>TravelMatch</span>
+    </div>
+
+    <ng-container *ngIf="step === 'terms'">
+      <div class="step-icon">📋</div>
+      <p class="eyebrow">WELCOME ABOARD</p>
+      <h1>Before you start travelling</h1>
+      <p class="intro">
+        Please review and accept the TravelMatch Terms &amp; Conditions
+        before using the platform.
+      </p>
+
+      <section class="terms-box">
+        <h2>TravelMatch Terms &amp; Conditions</h2>
+        <p>
+          TravelMatch helps people discover travel plans and connect with
+          potential travel partners. Use the service responsibly and respect
+          other travelers.
+        </p>
+        <ul>
+          <li>Use accurate information and keep your account secure.</li>
+          <li>Do not harass, scam, impersonate, or threaten other users.</li>
+          <li>Respect other travelers and local laws while using the service.</li>
+          <li>Report suspicious, abusive, or unsafe behavior to TravelMatch.</li>
+          <li>TravelMatch cannot guarantee the identity or behavior of another traveler.</li>
+        </ul>
+      </section>
+
+      <label class="consent-row">
+        <input type="checkbox" [(ngModel)]="termsAccepted" />
+        <span>
+          I have read and agree to the TravelMatch Terms &amp; Conditions.
+        </span>
+      </label>
+
+      <button
+        type="button"
+        class="primary-btn"
+        [disabled]="!termsAccepted || processing"
+        (click)="acceptTerms()"
+      >
+        {{ processing ? 'Saving...' : 'Accept & Continue' }}
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="step === 'notifications'">
+      <div class="step-icon">🔔</div>
+      <p class="eyebrow">STAY IN THE LOOP</p>
+      <h1>Allow push notifications?</h1>
+      <p class="intro">
+        Get important TravelMatch updates such as new match requests,
+        messages, matches, and other account notifications.
+      </p>
+
+      <div class="notification-list">
+        <div><span>🤝</span><span>New travel partner requests</span></div>
+        <div><span>💬</span><span>New messages</span></div>
+        <div><span>✨</span><span>New matches and activity</span></div>
+      </div>
+
+      <button
+        type="button"
+        class="primary-btn"
+        [disabled]="processing"
+        (click)="allowNotifications()"
+      >
+        {{ processing ? 'Setting up...' : 'Allow Notifications' }}
+      </button>
+
+      <button
+        type="button"
+        class="secondary-btn"
+        [disabled]="processing"
+        (click)="skipNotifications()"
+      >
+        Not Now
+      </button>
+
+      <p class="permission-note">
+        You can change notification permission later in your browser settings.
+      </p>
+    </ng-container>
+  </main>
+</div>

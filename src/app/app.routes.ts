@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { VerifyEmailComponent } from './auth/verify-email/verify-email.component';
+import { OnboardingComponent } from './auth/onboarding/onboarding.component';
 
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
 import { VerifyResetComponent } from './auth/verify-reset/verify-reset.component';
@@ -49,6 +50,12 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent
+  },
+
+  {
+    path: 'onboarding',
+    component: OnboardingComponent,
+    canActivate: [authGuard]
   },
 
   {

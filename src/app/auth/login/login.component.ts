@@ -203,6 +203,11 @@ export class LoginComponent implements OnInit {
             response.role
           );
 
+          // Backend decides whether this is a first-login onboarding session.
+          this.authService.setOnboardingRequired(
+            Boolean(response.requiresOnboarding)
+          );
+
 
           /*
            * IMPORTANT:
@@ -215,11 +220,15 @@ export class LoginComponent implements OnInit {
 
 
           /*
-           * Go directly to the authenticated application.
+           * New accounts must complete onboarding before entering
+           * the main application. Existing accounts go straight to
+           * Dashboard.
            */
-          this.router.navigate([
-            '/dashboard'
-          ]);
+          if (Boolean(response.requiresOnboarding)) {
+            this.router.navigate(['/onboarding']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
         },
 
 

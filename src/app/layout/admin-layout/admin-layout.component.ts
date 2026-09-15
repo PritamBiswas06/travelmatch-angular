@@ -12,8 +12,8 @@ import { CommonModule } from '@angular/common';
 import { LoaderService } from '../../core/loader.service';
 
 import { DataCacheService } from '../../core/data-cache.service';
-
 import { AuthService } from '../../auth/auth.service';
+
 
 @Component({
   selector: 'app-admin-layout',

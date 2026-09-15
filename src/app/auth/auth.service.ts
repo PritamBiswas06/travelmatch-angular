@@ -9,6 +9,41 @@ export class AuthService {
 
   private baseUrl = `${API_BASE_URL}/auth`;
 
+  /**
+   * First-login onboarding state returned by the backend.
+   */
+  isOnboardingRequired(): boolean {
+    return localStorage.getItem('onboardingRequired') === 'true';
+  }
+
+  setOnboardingRequired(required: boolean): void {
+    if (required) {
+      localStorage.setItem('onboardingRequired', 'true');
+    } else {
+      localStorage.removeItem('onboardingRequired');
+    }
+  }
+
+  getOnboardingStatus() {
+    return this.http.get<{
+      requiresOnboarding: boolean;
+      termsAccepted: boolean;
+      termsVersion: string;
+    }>('/api/onboarding/status');
+  }
+
+  acceptTerms() {
+    return this.http.post<{
+      message: string;
+      termsAccepted: boolean;
+      termsVersion: string;
+    }>('/api/onboarding/accept-terms', {});
+  }
+
+  completeOnboarding() {
+    return this.http.post<{ message: string }>('/api/onboarding/complete', {});
+  }
+
   /*
    * TravelMatch remembered-login duration.
    *
@@ -153,6 +188,7 @@ export class AuthService {
     localStorage.removeItem('name');
     localStorage.removeItem('role');
     localStorage.removeItem('authExpiresAt');
+    localStorage.removeItem('onboardingRequired');
   }
 
 

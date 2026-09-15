@@ -90,7 +90,11 @@ export class AppComponent implements OnInit, OnDestroy {
      * Automatically open Dashboard.
      */
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
+      if (this.authService.isOnboardingRequired()) {
+        this.router.navigate(['/onboarding']);
+      } else {
+        this.router.navigate(['/dashboard']);
+      }
 
       return;
     }

@@ -20,7 +20,7 @@ import {
 } from './loader.service';
 
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = (_route, state) => {
 
   const router =
     inject(Router);
@@ -42,6 +42,15 @@ export const authGuard: CanActivateFn = () => {
    * - 10-day remembered-login expiration
    */
   if (authService.isAuthenticated()) {
+
+    /*
+     * Keep first-login users inside onboarding until they finish it.
+     * This is a client-side navigation guard; the backend still requires
+     * Terms acceptance before the onboarding completion endpoint succeeds.
+     */
+    if (authService.isOnboardingRequired() && state.url !== '/onboarding') {
+      return router.createUrlTree(['/onboarding']);
+    }
 
     return true;
   }
